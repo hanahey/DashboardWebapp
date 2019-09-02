@@ -24,9 +24,11 @@ namespace DashboardWebapp.Models
         [Display(Name = "Category")]
         public Category Category { get; set; }
 
+        public string Direction {get; set; }
+
         public virtual RecurringTransaction RecurringTransaction { get; set; }
 
-        [Display(Name = "Period")]
+        [Display(Name = "Frequency")]
         public virtual Period Period { get; set; }
 
         [Display(Name = "Tracker")]

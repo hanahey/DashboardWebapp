@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\DashboardWebapp",
+    "\\DashboardWebapp\\Controllers",
+    "\\DashboardWebapp\\Models",
+    "\\DashboardWebapp\\Views",
+    "\\DashboardWebapp\\Views\\Categories",
+    "\\DashboardWebapp\\Views\\Trackers"
+  ],
+  "SelectedNode": "\\DashboardWebapp\\Views\\_ViewStart.cshtml",
+  "PreviewInSolutionExplorer": false
+}

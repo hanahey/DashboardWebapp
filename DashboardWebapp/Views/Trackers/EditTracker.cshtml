@@ -18,7 +18,7 @@
         @Html.HiddenFor(model => model.Id)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2", @style = "text-align:left" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
@@ -26,7 +26,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.GoalAmount, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.GoalAmount, htmlAttributes: new { @class = "control-label col-md-2", @style = "text-align:left" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.GoalAmount, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.GoalAmount, "", new { @class = "text-danger" })
@@ -34,7 +34,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2", @style = "text-align:left" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker",
                @Value = Model.StartDate.ToString("yyyy-MM-dd")} })
@@ -43,7 +43,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.GoalDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.GoalDate, htmlAttributes: new { @class = "control-label col-md-2", @style = "text-align:left" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.GoalDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker",
                    @Value = Model.GoalDate.ToString("yyyy-MM-dd")} })
@@ -52,7 +52,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2", @style = "text-align:left" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
                 @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
@@ -63,15 +63,12 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-primary btn-large" })
+                <input type="submit" value="Save" class="btn btn-success" />
             </div>
         </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

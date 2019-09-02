@@ -20,6 +20,13 @@ namespace DashboardWebapp.Controllers
                              select t;
             return View(trackers);
         }
+
+         // GET: Trackers/Details/5
+        public ActionResult TrackerTransactions(int id)
+        {
+            var transactions = from trans in db.Transactions where trans.TrackerId == id select trans;
+            return View(transactions);
+        }
         
 
         // GET: Trackers/Create
@@ -96,7 +103,6 @@ namespace DashboardWebapp.Controllers
                 var tracker = from t in db.Trackers where t.Id == id select t;
                 db.Trackers.Remove(tracker.First());
                 db.SaveChanges();
-
                 return RedirectToAction("Index");
             }
             catch

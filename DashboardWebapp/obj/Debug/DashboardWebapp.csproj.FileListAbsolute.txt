@@ -123,3 +123,4 @@ D:\~DashboardWebapp Project\DashboardWebapp\DashboardWebapp\obj\Debug\DashboardW
 D:\~DashboardWebapp Project\DashboardWebapp\DashboardWebapp\obj\Debug\DashboardWebapp.csproj.CopyComplete
 D:\~DashboardWebapp Project\DashboardWebapp\DashboardWebapp\obj\Debug\DashboardWebapp.dll
 D:\~DashboardWebapp Project\DashboardWebapp\DashboardWebapp\obj\Debug\DashboardWebapp.pdb
+D:\~DashboardWebapp Project\DashboardWebapp\DashboardWebapp\obj\Debug\DashboardWebapp.csprojAssemblyReference.cache

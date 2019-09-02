@@ -1,0 +1,25 @@
+﻿@model DashboardWebapp.Models.Category
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+
+        <div class="form-group" style="text-align:center">
+            <p>Are you sure you want to delete the <b> @Model.Name </b> category? </p>
+            <p>
+                Please note that you may not delete a category which is currently in use.
+
+                Please update the categories of any items still tagged to this category before attempting to delete it.
+            </p>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8">
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-primary btn-large" })
+                <input type="submit" value="Delete" class="btn btn-danger" />
+            </div>
+        </div>
+    </div>
+}
