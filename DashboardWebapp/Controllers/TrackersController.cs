@@ -32,7 +32,7 @@ namespace DashboardWebapp.Controllers
         // GET: Trackers/Create
         public ActionResult AddTracker()
         {
-            return View();
+            return PartialView();
         }
 
         // POST: Trackers/Create
@@ -59,7 +59,7 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return View();
+                return PartialView();
             }
         }
 
@@ -67,7 +67,7 @@ namespace DashboardWebapp.Controllers
         public ActionResult EditTracker(int id)
         {
             var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
-            return View(tracker);
+            return PartialView(tracker);
         }
 
         // POST: Trackers/Edit/5
@@ -89,14 +89,20 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return View();
+                return PartialView();
             }
+        }
 
+        // GET: Categories/Delete/5
+        public ActionResult DeleteTracker(int id)
+        {
+            var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
+            return PartialView(tracker);
         }
 
         // POST: Trackers/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id)
+        public ActionResult DeleteTracker(int id, Tracker model)
         {
             try
             {
@@ -107,7 +113,7 @@ namespace DashboardWebapp.Controllers
             }
             catch
             {
-                return View();
+                return PartialView();
             }
         }
     }

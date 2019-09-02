@@ -74,23 +74,6 @@ namespace DashboardWebapp.Controllers
             }
         }
 
-        // POST: Categories/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id)
-        {
-            try
-            {
-                var category = from c in db.Categories where c.Id == id select c;
-                db.Categories.Remove(category.First());
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return PartialView();
-            }
-        }
-
         // GET: Categories/Delete/5
         public ActionResult DeleteCategory(int id)
         {
