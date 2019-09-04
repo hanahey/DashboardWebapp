@@ -83,7 +83,7 @@ namespace DashboardWebapp.Controllers
                     var recurringTransaction = new RecurringTransaction
                     {
                         Name = model.Name,
-                        StartDate = model.Date,
+                        StartDate = (DateTime)model.StartDate,
                         EndDate = model.EndDate,
                         PeriodId = (int)model.PeriodId,
                     };
@@ -93,7 +93,7 @@ namespace DashboardWebapp.Controllers
                     {
                         Name = model.Name,
                         Amount = model.Amount,
-                        Date = model.Date,
+                        Date = (DateTime)model.StartDate,
                         CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,

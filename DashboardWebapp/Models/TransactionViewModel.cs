@@ -56,6 +56,9 @@ namespace DashboardWebapp.Models
 
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
 
+        [Display(Name = "Start Date")]
+        public DateTime? StartDate { get; set; }
+
         [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
     }

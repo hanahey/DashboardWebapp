@@ -19,10 +19,10 @@
         </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" id="dateDiv">
         @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
         <div class="col-md-8">
-            @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
+            @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker", @id = "selectedDate" } })
             @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
         </div>
     </div>
@@ -55,13 +55,22 @@
     <div class="form-group">
         @Html.LabelFor(model => model.PeriodId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
         <div class="col-md-8">
-            @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onchange = "hideShowEndDate(this)"})
+            @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onChange = "hideShowStartEndDate(this)" })
             @Html.ValidationMessageFor(model => model.PeriodId, "", new { @class = "text-danger" })
         </div>
     </div>
 
+    @*Display only when Period is NOT "Single -- will be pre-populated with the "Date" value, if any"*@
+    <div class="form-group" id="startDateDiv" style="display:none">
+        @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker", @id = "startDate" } })
+            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
     @*Display only when Period is NOT "Single"*@
-    <div class="form-group" id="endDate" style="display:none">
+    <div class="form-group" id="endDateDiv" style="display:none">
         @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
         <div class="col-md-8">
             @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
@@ -86,16 +95,25 @@
 }
 
 <script type="text/javascript">
-    function hideShowEndDate(e)
-    {
+
+    function hideShowStartEndDate(e) {
         var periodId = $(e).find('option:selected').val();
-        var endDate = document.getElementById('endDate');
-        if (periodId > 0)
-        {           
-            endDate.style.display = 'block';           
+        var endDateDiv = document.getElementById('endDateDiv');
+        var startDateDiv = document.getElementById('startDateDiv');
+        var dateDiv = document.getElementById('dateDiv');
+        var selectedDate = document.getElementById('selectedDate');
+        var startDate = document.getElementById('startDate');       
+
+        if (periodId > 0) {
+            endDateDiv.style.display = 'block';
+            startDateDiv.style.display = 'block';
+            dateDiv.style.display = 'none';
+            startDate.value = selectedDate.value;
         }
-        else
-            endDate.style.display = 'none';
-            
+        else {
+            endDateDiv.style.display = 'none';
+            startDateDiv.style.display = 'none';
+            dateDiv.style.display = 'block';
+        }
     }
 </script>
