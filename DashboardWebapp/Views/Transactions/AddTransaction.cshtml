@@ -1,96 +1,99 @@
-﻿@model DashboardWebapp.Models.Transaction
+﻿@model DashboardWebapp.Models.TransactionViewModel
+
 
 @{
     ViewBag.Title = "AddTransaction";
 }
 
-<h2>AddTransaction</h2>
-
-
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Transaction</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-            </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Direction, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Direction, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Direction, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CategoryId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.RecurringTransactionId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.RecurringTransactionId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.RecurringTransactionId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.TrackerId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.TrackerId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.TrackerId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.PersonId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.PersonId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.PersonId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
+<div class="form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
         </div>
     </div>
-}
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
+    <div class="form-group">
+        @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
+            @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control", @Value = "" } })
+            @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.CategoryCollection, "Id", "Name"), "None", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Direction, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.RadioButtonFor(m => m.Direction, "In") In &nbsp;
+            @Html.RadioButtonFor(m => m.Direction, "Out", new { @checked = "checked" }) Out
+            @Html.ValidationMessageFor(model => model.Direction, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.PeriodId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8" id = "selectedPeriod">
+            @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onchange = "hideShowEndDate()"@*, @id = "selectedPeriod"*@ })
+            @Html.ValidationMessageFor(model => model.PeriodId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.TrackerId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.DropDownListFor(model => model.TrackerId, new SelectList(Model.TrackerCollection, "Id", "Name"), "None", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.TrackerId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group" id="endDate" style="display:none">
+        @Html.LabelFor(model => model.RecurringTransaction.EndDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.EditorFor(model => model.RecurringTransaction.EndDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
+            @Html.ValidationMessageFor(model => model.RecurringTransaction.EndDate, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-4 col-md-8">
+            <input type="submit" value="Add" class="btn btn-success" />
+        </div>
+    </div>
 </div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
 }
+
+<script type="text/javascript">
+    function hideShowEndDate() //TO DO: Fix the hide portion!!!
+    {
+        var period = document.getElementById('selectedPeriod').innerText;
+        var endDate = document.getElementById('endDate');
+        if (period != 'Single')
+        {
+            endDate.style.display = 'block';
+        }
+        else
+            endDate.style.display = 'none';
+    }
+</script>

@@ -214,6 +214,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\TrackersController.cs" />
+    <Compile Include="Controllers\TransactionsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -295,13 +296,15 @@
     <Content Include="Views\Trackers\AddTracker.cshtml" />
     <Content Include="Views\Trackers\Index.cshtml" />
     <Content Include="Views\Trackers\EditTracker.cshtml" />
-    <Content Include="Views\Transactions\AddTransaction.cshtml" />
     <Content Include="Views\Categories\AddCategory.cshtml" />
     <Content Include="Views\Categories\Index.cshtml" />
     <Content Include="Views\Categories\EditCategory.cshtml" />
     <Content Include="Views\Trackers\TrackerTransactions.cshtml" />
     <Content Include="Views\Categories\DeleteCategory.cshtml" />
     <Content Include="Views\Trackers\DeleteTracker.cshtml" />
+    <Content Include="Views\Transactions\AddTransaction.cshtml" />
+    <Content Include="Views\Transactions\Index.cshtml" />
+    <Content Include="Views\Transactions\DeleteTransaction.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

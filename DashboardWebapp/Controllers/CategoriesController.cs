@@ -87,8 +87,8 @@ namespace DashboardWebapp.Controllers
         {
             try
             {
-                var thisCategory = from c in db.Categories where c.Id == id select c;
-                db.Categories.Remove(thisCategory.First());
+                var thisCategory = (from c in db.Categories where c.Id == id select c).First();
+                db.Categories.Remove(thisCategory);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

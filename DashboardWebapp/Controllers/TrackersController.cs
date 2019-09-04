@@ -106,8 +106,8 @@ namespace DashboardWebapp.Controllers
         {
             try
             {
-                var tracker = from t in db.Trackers where t.Id == id select t;
-                db.Trackers.Remove(tracker.First());
+                var tracker = (from t in db.Trackers where t.Id == id select t).First();
+                db.Trackers.Remove(tracker);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

@@ -21,8 +21,10 @@ namespace DashboardWebapp.Models
         [StringLength(50)]
         public string Name { get; set; }
 
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime StartDate { get; set; }
 
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime? EndDate { get; set; }
 
         public int PeriodId { get; set; }
