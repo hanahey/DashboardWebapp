@@ -50,8 +50,13 @@ namespace DashboardWebapp.Models
 
         public virtual Tracker Tracker { get; set; }
 
-        public int RecurringTransactionId { get; set; }
+        public int? RecurringTransactionId { get; set; }
 
         public virtual RecurringTransaction RecurringTransaction { get; set; }
+
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
+
+        [Display(Name = "End Date")]
+        public DateTime? EndDate { get; set; }
     }
 }

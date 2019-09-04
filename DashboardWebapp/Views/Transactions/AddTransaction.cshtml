@@ -38,7 +38,7 @@
     <div class="form-group">
         @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
         <div class="col-md-8">
-            @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.CategoryCollection, "Id", "Name"), "None", new { @class = "form-control" })
+            @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.CategoryCollection, "Id", "Name"), "Select", new { @class = "form-control" })
             @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
         </div>
     </div>
@@ -54,9 +54,18 @@
 
     <div class="form-group">
         @Html.LabelFor(model => model.PeriodId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
-        <div class="col-md-8" id = "selectedPeriod">
-            @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onchange = "hideShowEndDate()"@*, @id = "selectedPeriod"*@ })
+        <div class="col-md-8">
+            @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onchange = "hideShowEndDate(this)"})
             @Html.ValidationMessageFor(model => model.PeriodId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    @*Display only when Period is NOT "Single"*@
+    <div class="form-group" id="endDate" style="display:none">
+        @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+        <div class="col-md-8">
+            @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
+            @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
         </div>
     </div>
 
@@ -65,14 +74,6 @@
         <div class="col-md-8">
             @Html.DropDownListFor(model => model.TrackerId, new SelectList(Model.TrackerCollection, "Id", "Name"), "None", new { @class = "form-control" })
             @Html.ValidationMessageFor(model => model.TrackerId, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group" id="endDate" style="display:none">
-        @Html.LabelFor(model => model.RecurringTransaction.EndDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
-        <div class="col-md-8">
-            @Html.EditorFor(model => model.RecurringTransaction.EndDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
-            @Html.ValidationMessageFor(model => model.RecurringTransaction.EndDate, "", new { @class = "text-danger" })
         </div>
     </div>
 
@@ -85,15 +86,16 @@
 }
 
 <script type="text/javascript">
-    function hideShowEndDate() //TO DO: Fix the hide portion!!!
+    function hideShowEndDate(e)
     {
-        var period = document.getElementById('selectedPeriod').innerText;
+        var periodId = $(e).find('option:selected').val();
         var endDate = document.getElementById('endDate');
-        if (period != 'Single')
-        {
-            endDate.style.display = 'block';
+        if (periodId > 0)
+        {           
+            endDate.style.display = 'block';           
         }
         else
             endDate.style.display = 'none';
+            
     }
 </script>

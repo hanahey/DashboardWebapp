@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace DashboardWebapp.Controllers
 {
+    [Authorize]
     public class TransactionsController : Controller
     {
         DashboardContext db = new DashboardContext();
@@ -78,11 +79,12 @@ namespace DashboardWebapp.Controllers
                     db.Transactions.Add(transaction);
                 }
                 else //add RecurringTransactionId + RecurringTransaction record if needed
-                {                
+                { 
                     var recurringTransaction = new RecurringTransaction
                     {
                         Name = model.Name,
                         StartDate = model.Date,
+                        EndDate = model.EndDate,
                         PeriodId = (int)model.PeriodId,
                     };
                     db.RecurringTransactions.Add(recurringTransaction);
@@ -133,14 +135,6 @@ namespace DashboardWebapp.Controllers
         // GET: Transactions/Delete/5
         public ActionResult DeleteTransaction(int id)
         {
-            //var transaction = (from t in db.Transactions
-            //                   where t.Id == id
-            //                   select new TransactionViewModel
-            //                   {
-            //                       Id = t.Id,
-            //                       Name = t.Name
-            //                   }).First();
-
             var transaction = (from t in db.Transactions
                                where t.Id == id select t).First();
             return PartialView(transaction);
@@ -152,8 +146,17 @@ namespace DashboardWebapp.Controllers
         {
             try
             {
-                var thisTransaction = (from t in db.Transactions where t.Id == id select t).First();
-                db.Transactions.Remove(thisTransaction);
+                var thisTransaction = (from t in db.Transactions where t.Id == id select t).First();         
+
+                //set recurring transaction end date to current date time to prevent future transactions
+                if (thisTransaction.RecurringTransaction !=null)
+                {
+                    var recurringTransaction = (from t in db.RecurringTransactions where t.Id == thisTransaction.RecurringTransactionId
+                                                select t).First();
+                    recurringTransaction.EndDate = DateTime.Now;
+                }
+
+                db.Transactions.Remove(thisTransaction); //remove AFTER checking for RecurringTransaction or else RecurringTransaction will always be null
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

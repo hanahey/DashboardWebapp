@@ -17,6 +17,7 @@ namespace DashboardWebapp.Models
 
         public double Amount { get; set; }
 
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime Date { get; set; }
 
         public int? CategoryId { get; set; }
