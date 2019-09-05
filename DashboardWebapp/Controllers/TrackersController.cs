@@ -25,7 +25,12 @@ namespace DashboardWebapp.Controllers
         public ActionResult TrackerTransactions(int id)
         {
             var transactions = from trans in db.Transactions where trans.TrackerId == id select trans;
-            return View(transactions);
+            foreach (var transaction in transactions)
+            {
+                if (transaction.Amount < 0)
+                    transaction.Amount = -transaction.Amount;
+            }
+            return PartialView(transactions);
         }
         
 
