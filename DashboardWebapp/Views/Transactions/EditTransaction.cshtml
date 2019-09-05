@@ -51,10 +51,11 @@
             </div>
         </div>
 
+        @*read only*@
         <div class="form-group">
             @Html.LabelFor(model => model.PeriodId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
             <div class="col-md-8">
-                @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onChange = "hideShowStartEndDate(this)", @id = "period" })
+                @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", disabled="disabled", @id = "period" })
                 @Html.ValidationMessageFor(model => model.PeriodId, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -145,29 +146,5 @@
                     dateDiv.style.display = 'block';
                 }
             });
-
-    function hideShowStartEndDate(e) {
-        var periodId = $(e).find('option:selected').val();
-
-        if (periodId > 0 && dateFromDb != startDateFromDb)
-        {
-            dateDiv.style.display = 'block';
-            startDateDiv.style.display = 'block';
-            endDateDiv.style.display = 'block';
-        }
-        else if (periodId > 0)
-        {            
-            startDateDiv.style.display = 'block';
-            endDateDiv.style.display = 'block';
-            dateDiv.style.display = 'none';
-            startDate.value = selectedDate.value;
-        }
-        else
-        {
-            endDateDiv.style.display = 'none';
-            startDateDiv.style.display = 'none';
-            dateDiv.style.display = 'block';
-        }
-    }
 
 </script>

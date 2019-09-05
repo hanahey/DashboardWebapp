@@ -56,7 +56,7 @@ namespace DashboardWebapp.Controllers
             if (model.PeriodId > 0)
             {
                 selectedPeriod = (from p in db.Periods where p.Id == model.PeriodId select p).First();
-            }            
+            }
 
             if (model.Direction == "Out") //append negative symbol to Amount if money is going out
             {
@@ -79,7 +79,7 @@ namespace DashboardWebapp.Controllers
                     db.Transactions.Add(transaction);
                 }
                 else //add RecurringTransactionId + RecurringTransaction record if needed
-                { 
+                {
                     var recurringTransaction = new RecurringTransaction
                     {
                         Name = model.Name,
@@ -100,7 +100,7 @@ namespace DashboardWebapp.Controllers
                         RecurringTransactionId = recurringTransaction.Id
                     };
                     db.Transactions.Add(transaction);
-                }                
+                }
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -114,20 +114,20 @@ namespace DashboardWebapp.Controllers
         public ActionResult EditTransaction(int id)
         {
             TransactionViewModel transaction = (from t in db.Transactions
-                                               where t.Id == id
-                                               select new TransactionViewModel
-                                               {
-                                                   Id = t.Id,
-                                                   Name = t.Name,
-                                                   Date = t.Date,
-                                                   Amount = t.Amount,
-                                                   CategoryId = t.CategoryId,
-                                                   PeriodId = t.RecurringTransaction.PeriodId,
-                                                   StartDate = t.RecurringTransaction.StartDate,
-                                                   EndDate = t.RecurringTransaction.EndDate,
-                                                   RecurringTransactionId = t.RecurringTransactionId,
-                                                   TrackerId = t.TrackerId,
-                                               }).First(); 
+                                                where t.Id == id
+                                                select new TransactionViewModel
+                                                {
+                                                    Id = t.Id,
+                                                    Name = t.Name,
+                                                    Date = t.Date,
+                                                    Amount = t.Amount,
+                                                    CategoryId = t.CategoryId,
+                                                    PeriodId = t.RecurringTransaction.PeriodId,
+                                                    StartDate = t.RecurringTransaction.StartDate,
+                                                    EndDate = t.RecurringTransaction.EndDate,
+                                                    RecurringTransactionId = t.RecurringTransactionId,
+                                                    TrackerId = t.TrackerId,
+                                                }).First();
             if (transaction.Amount < 0)
             {
                 transaction.Amount = -transaction.Amount;
@@ -163,13 +163,58 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult EditTransaction(int id, TransactionViewModel model)
         {
-            try
-            {
-                // TODO: Add update logic here
+            var transaction = (from t in db.Transactions where t.Id == id select t).First();
+            var recurringTransaction = (from t in db.RecurringTransactions where t.Id == transaction.RecurringTransactionId select t).First();
+            var firstTransaction = (from x in recurringTransaction.Transactions orderby x.Date select x).First();
 
+             //set the Start Date as the Date for a recurring transaction without any other transactions
+            if (transaction.RecurringTransaction.PeriodId > 0 && ((transaction.RecurringTransaction.Transactions.Count == 1) ||
+               ((transaction.RecurringTransaction.Transactions.Count > 1) && (transaction == firstTransaction))))
+            {
+                transaction.Date = (DateTime)model.StartDate;
+            }
+            else
+                transaction.Date = model.Date;
+
+            if (model.Direction == "Out") 
+                model.Amount = -(model.Amount);
+            transaction.Name = model.Name;
+            transaction.Amount = model.Amount; 
+            
+            transaction.TrackerId = model.TrackerId;
+            transaction.CategoryId = model.CategoryId;
+            // transaction.RecurringTransactionId = model.RecurringTransactionId; -- read only
+
+            if (transaction.RecurringTransactionId != null)
+            {                
+                recurringTransaction.Name = model.Name;
+                if (model.StartDate != null)
+                    recurringTransaction.StartDate = (DateTime)model.StartDate;
+                if (model.EndDate != null)
+                    recurringTransaction.EndDate = (DateTime)model.EndDate;
+
+                /*If a RecurringTransaction is edited and it has more than 1 transaction, modify the names of all its 
+                  Transactions to follow the latest RecurringTransaction.Name and append a number (ie. "Name" #2)*/
+                if (recurringTransaction.Transactions.Count > 1)
+                {
+                    var transactionList = from t in db.Transactions where t.RecurringTransactionId == recurringTransaction.Id orderby id select t;
+                    int numberTransaction = 0;
+
+                    foreach (Transaction rt in transactionList)
+                    {
+                        numberTransaction += 1;
+                        rt.Name = model.Name + " [" + numberTransaction.ToString() + "]";
+                    }
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                db.SaveChanges();
+                TempData["Success"] = "Changes Saved!";
                 return RedirectToAction("Index");
             }
-            catch
+            else
             {
                 return PartialView();
             }
@@ -189,7 +234,7 @@ namespace DashboardWebapp.Controllers
         {
             try
             {
-                var thisTransaction = (from t in db.Transactions where t.Id == id select t).First();         
+                var thisTransaction = (from t in db.Transactions where t.Id == id select t).First();
 
                 //set recurring transaction end date to current date time to prevent future transactions
                 if (thisTransaction.RecurringTransaction !=null)
