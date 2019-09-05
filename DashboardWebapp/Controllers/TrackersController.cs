@@ -51,6 +51,7 @@ namespace DashboardWebapp.Controllers
                     GoalAmount = model.GoalAmount,
                     StartDate = model.StartDate,
                     GoalDate = model.GoalDate,
+                    EndDate = model.EndDate,
                     PersonId = currentPersonId,
                 };
                 db.Trackers.Add(tracker);
@@ -67,6 +68,13 @@ namespace DashboardWebapp.Controllers
         public ActionResult EditTracker(int id)
         {
             var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
+
+            //Store EndDate in ViewBag to populate datepicker if EndDate exists in db
+            ViewBag.EndDate = null;
+            if (tracker.EndDate != null)
+            {
+                ViewBag.EndDate = ((DateTime)(tracker.EndDate)).ToString("yyyy-MM-dd");
+            }
             return PartialView(tracker);
         }
 
@@ -80,7 +88,7 @@ namespace DashboardWebapp.Controllers
             thisTracker.StartDate = tracker.StartDate;
             thisTracker.GoalDate = tracker.GoalDate;
             thisTracker.EndDate = tracker.EndDate;
-
+           
             if (ModelState.IsValid)
             {
                 db.SaveChanges();
