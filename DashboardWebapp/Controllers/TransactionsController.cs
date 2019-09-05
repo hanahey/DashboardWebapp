@@ -111,14 +111,57 @@ namespace DashboardWebapp.Controllers
         }
 
         // GET: Transactions/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult EditTransaction(int id)
         {
-            return PartialView();
+            TransactionViewModel transaction = (from t in db.Transactions
+                                               where t.Id == id
+                                               select new TransactionViewModel
+                                               {
+                                                   Id = t.Id,
+                                                   Name = t.Name,
+                                                   Date = t.Date,
+                                                   Amount = t.Amount,
+                                                   CategoryId = t.CategoryId,
+                                                   PeriodId = t.RecurringTransaction.PeriodId,
+                                                   StartDate = t.RecurringTransaction.StartDate,
+                                                   EndDate = t.RecurringTransaction.EndDate,
+                                                   RecurringTransactionId = t.RecurringTransactionId,
+                                                   TrackerId = t.TrackerId,
+                                               }).First(); 
+            if (transaction.Amount < 0)
+            {
+                transaction.Amount = -transaction.Amount;
+                transaction.Direction = "Out";
+            }
+            else
+                transaction.Direction = "In";
+
+            //Populate dropdown lists
+            transaction.CategoryCollection = db.Categories.ToList<Category>();
+            transaction.PeriodCollection = db.Periods.ToList<Period>();
+            transaction.TrackerCollection = db.Trackers.ToList<Tracker>();
+
+            ViewBag.Date = transaction.Date.ToString("yyyy-MM-dd"); //to pre-populate datepicker
+
+            //store StartDate in ViewBag to compare with Date + to pre-populate datepicker if StartDate != Date
+            ViewBag.StartDate = null; // set to null for condition check in View
+            if (transaction.StartDate != null)
+            {
+                ViewBag.StartDate = ((DateTime)(transaction.StartDate)).ToString("yyyy-MM-dd");  //to pre-populate EndDate datepicker
+            }
+            //store EndDate in ViewBag to pre-populate datepicker
+            ViewBag.EndDate = null; // set to null for condition check in View
+            if (transaction.EndDate!=null)
+            {
+                ViewBag.EndDate = ((DateTime)(transaction.EndDate)).ToString("yyyy-MM-dd");  //to pre-populate EndDate datepicker
+            }
+
+            return PartialView(transaction);
         }
 
         // POST: Transactions/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult EditTransaction(int id, TransactionViewModel model)
         {
             try
             {
