@@ -16,7 +16,7 @@ namespace DashboardWebapp.Controllers
         // GET: Transactions
         public ActionResult Index()
         {
-            var transactions = from t in db.Transactions
+            var transactions = from t in db.Transactions orderby t.Id descending 
                                select new TransactionViewModel
                                {
                                    Id = t.Id,

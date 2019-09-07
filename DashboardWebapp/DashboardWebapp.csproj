@@ -226,6 +226,7 @@
     <Compile Include="Models\Period.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\RecurringTransaction.cs" />
+    <Compile Include="Models\TrackerViewModel.cs" />
     <Compile Include="Models\Tracker.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\TransactionViewModel.cs" />
@@ -242,6 +243,13 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\add-button.png" />
+    <Content Include="Images\calendar-icon.png" />
+    <Content Include="Images\delete-button.png" />
+    <Content Include="Images\edit-button.png" />
+    <Content Include="Images\hourglass-icon.png" />
+    <Content Include="Images\medal-icon.png" />
+    <Content Include="Images\recurring-transaction-icon.png" />
+    <Content Include="Images\trophy-icon.png" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
@@ -306,6 +314,9 @@
     <Content Include="Views\Transactions\Index.cshtml" />
     <Content Include="Views\Transactions\DeleteTransaction.cshtml" />
     <Content Include="Views\Transactions\EditTransaction.cshtml" />
+    <Content Include="Views\Home\Trackers.cshtml" />
+    <Content Include="Views\Home\OneTimePayment.cshtml" />
+    <Content Include="Views\Home\AddRecurringPayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
