@@ -17,7 +17,8 @@ namespace DashboardWebapp.Controllers
         {
             return View();
         }
-
+        
+        //Tracker methods:
         public ActionResult Trackers()
         {
             //currently show only ongoing trackers     
@@ -161,8 +162,7 @@ namespace DashboardWebapp.Controllers
             ViewBag.TrackerName = (from t in db.Trackers where t.Id == id select t.Name).First(); //get tracker
             return PartialView(recurringTransaction);
         }
-
-        // POST: Transactions/Delete/5
+        
         [HttpPost]
         public ActionResult StopRecurringPayment(int id, RecurringTransaction model)
         {
@@ -184,19 +184,108 @@ namespace DashboardWebapp.Controllers
                 return PartialView(model);
             }
         }
-        
-            //public ActionResult About()
-            //{
-            //    ViewBag.Message = "Your application description page.";
 
-            //    return View();
-            //}
-
-            //public ActionResult Contact()
-            //{
-            //    ViewBag.Message = "Your contact page.";
-
-            //    return View();
-            //}
+        public ActionResult AddTracker()
+        {
+            return PartialView();
         }
+        
+        [HttpPost]
+        public ActionResult AddTracker(Tracker model)
+        {
+            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
+                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
+            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
+
+            if (ModelState.IsValid)
+            {
+                var tracker = new Tracker
+                {
+                    Name = model.Name,
+                    GoalAmount = model.GoalAmount,
+                    StartDate = model.StartDate,
+                    GoalDate = model.GoalDate,
+                    EndDate = model.EndDate,
+                    PersonId = currentPersonId,
+                };
+                db.Trackers.Add(tracker);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return PartialView();
+            }
+        }        
+        public ActionResult EditTracker(int id)
+        {
+            var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
+
+            //Store EndDate in ViewBag to populate datepicker if EndDate exists in db
+            ViewBag.EndDate = null;
+            if (tracker.EndDate != null)
+            {
+                ViewBag.EndDate = ((DateTime)(tracker.EndDate)).ToString("yyyy-MM-dd");
+            }
+            return PartialView(tracker);
+        }
+        
+        [HttpPost]
+        public ActionResult EditTracker(int id, Tracker tracker)
+        {
+            var thisTracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
+            thisTracker.Name = tracker.Name;
+            thisTracker.GoalAmount = tracker.GoalAmount;
+            thisTracker.StartDate = tracker.StartDate;
+            thisTracker.GoalDate = tracker.GoalDate;
+            thisTracker.EndDate = tracker.EndDate;
+
+            if (ModelState.IsValid)
+            {
+                db.SaveChanges();
+                TempData["Success"] = "Changes Saved!";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return PartialView();
+            }
+        }
+        
+        public ActionResult DeleteTracker(int id)
+        {
+            var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
+            return PartialView(tracker);
+        }
+        
+        [HttpPost]
+        public ActionResult DeleteTracker(int id, Tracker model)
+        {
+            try
+            {
+                var tracker = (from t in db.Trackers where t.Id == id select t).First();
+                db.Trackers.Remove(tracker);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return PartialView();
+            }
+        }
+
+        //public ActionResult About()
+        //{
+        //    ViewBag.Message = "Your application description page.";
+
+        //    return View();
+        //}
+
+        //public ActionResult Contact()
+        //{
+        //    ViewBag.Message = "Your contact page.";
+
+        //    return View();
+        //}
+    }
 }
