@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace DashboardWebapp.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         DashboardContext db = new DashboardContext();
@@ -19,8 +20,8 @@ namespace DashboardWebapp.Controllers
 
         public ActionResult Trackers()
         {
-            //currently show only ongoing trackers
-            var ongoingTrackers = from t in db.Trackers
+            //currently show only ongoing trackers     
+            var ongoingTrackers = (from t in db.Trackers
                                   where t.EndDate == null || t.EndDate >= DateTime.Now
                                   select new TrackerViewModel
                                   {
@@ -34,14 +35,14 @@ namespace DashboardWebapp.Controllers
                                       RecurringTransaction = (from rt in db.RecurringTransactions
                                                               where rt.Id == ((from trans in db.Transactions
                                                                                where trans.RecurringTransactionId != null && trans.TrackerId == t.Id
+                                                                               && (trans.RecurringTransaction.EndDate == null ||
+                                                                               trans.RecurringTransaction.EndDate > DateTime.Now)
                                                                                select trans.RecurringTransactionId).FirstOrDefault())
                                                               select rt).FirstOrDefault(),
                                       Transactions = t.Transactions,
-                                      AmountSaved = 0,
-                                  };
+                                  }).ToList();
 
             //need to manually change all negative Amount values to positive to calculate amount in tracker so far
-
             foreach (TrackerViewModel t in ongoingTrackers)
             {
                 double amountSaved = 0;
@@ -52,8 +53,7 @@ namespace DashboardWebapp.Controllers
                     amountSaved += trans.Amount;
 
                 }
-                t.AmountSaved = amountSaved;
-
+                ongoingTrackers.Where(x => x.Id == t.Id).First().AmountSaved = amountSaved;
             }
 
             //TO-DO LATER: Completed trackers
@@ -99,7 +99,7 @@ namespace DashboardWebapp.Controllers
 
             }
             else
-                return PartialView();
+                return PartialView(transaction);
         }
 
         public ActionResult AddRecurringPayment(int id)
@@ -147,23 +147,56 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                return PartialView(model);
             }
+        }        
+
+        public ActionResult StopRecurringPayment(int id)
+        {
+            var transaction = (from t in db.Transactions
+                               where t.TrackerId == id && t.RecurringTransaction != null orderby t.Id descending
+                               select t).First();
+            var recurringTransaction = (from rt in db.RecurringTransactions where 
+                                        rt.Id == transaction.RecurringTransactionId select rt).First();
+            ViewBag.TrackerName = (from t in db.Trackers where t.Id == id select t.Name).First(); //get tracker
+            return PartialView(recurringTransaction);
         }
 
+        // POST: Transactions/Delete/5
+        [HttpPost]
+        public ActionResult StopRecurringPayment(int id, RecurringTransaction model)
+        {
+            try
+            {
+                var transaction = (from t in db.Transactions
+                                   where t.TrackerId == id && t.RecurringTransaction != null
+                                   orderby t.Id descending
+                                   select t).First();
+                var recurringTransaction = (from rt in db.RecurringTransactions
+                                            where rt.Id == transaction.RecurringTransactionId
+                                            select rt).First();
+                recurringTransaction.EndDate = DateTime.Now;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return PartialView(model);
+            }
+        }
+        
+            //public ActionResult About()
+            //{
+            //    ViewBag.Message = "Your application description page.";
 
-        //public ActionResult About()
-        //{
-        //    ViewBag.Message = "Your application description page.";
+            //    return View();
+            //}
 
-        //    return View();
-        //}
+            //public ActionResult Contact()
+            //{
+            //    ViewBag.Message = "Your contact page.";
 
-        //public ActionResult Contact()
-        //{
-        //    ViewBag.Message = "Your contact page.";
-
-        //    return View();
-        //}
-    }
+            //    return View();
+            //}
+        }
 }

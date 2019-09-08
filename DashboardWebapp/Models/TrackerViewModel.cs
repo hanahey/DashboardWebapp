@@ -23,6 +23,7 @@ namespace DashboardWebapp.Models
 
         [Required]
         [Display(Name = "Goal Amount (£)")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public double GoalAmount { get; set; }
 
         [Required]
@@ -43,6 +44,7 @@ namespace DashboardWebapp.Models
 
         public RecurringTransaction RecurringTransaction { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public double AmountSaved { get; set; }
 
         public int PersonId { get; set; }

@@ -317,6 +317,7 @@
     <Content Include="Views\Home\Trackers.cshtml" />
     <Content Include="Views\Home\OneTimePayment.cshtml" />
     <Content Include="Views\Home\AddRecurringPayment.cshtml" />
+    <Content Include="Views\Home\StopRecurringPayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

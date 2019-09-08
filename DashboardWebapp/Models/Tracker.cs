@@ -24,6 +24,7 @@ namespace DashboardWebapp.Models
 
         [Required]
         [Display(Name = "Goal Amount (£)")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public double GoalAmount { get; set; }
 
         [Required]

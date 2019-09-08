@@ -16,6 +16,7 @@ namespace DashboardWebapp.Models
 
         [Required]
         [Display(Name = "Amount (£)")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public double Amount { get; set; }
 
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
