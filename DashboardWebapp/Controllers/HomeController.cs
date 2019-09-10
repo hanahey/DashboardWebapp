@@ -66,17 +66,14 @@ namespace DashboardWebapp.Controllers
 
         public ActionResult OneTimePayment(int id)
         {
-            var tracker = (from t in db.Trackers where t.Id == id select t).First(); //populate tracker field
             TransactionViewModel transaction = new TransactionViewModel();
             transaction.CategoryCollection = db.Categories.ToList<Category>();
-            transaction.Tracker = tracker;
+            transaction.Tracker = (from t in db.Trackers where t.Id == id select t).First();
             return PartialView(transaction);
-
-
         }
 
         [HttpPost]
-        public ActionResult OneTimePayment(int id, Transaction transaction)
+        public ActionResult OneTimePayment(int id, TransactionViewModel transaction)
         {
             //get logged in user
             string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
@@ -100,16 +97,19 @@ namespace DashboardWebapp.Controllers
 
             }
             else
+            {
+                transaction.CategoryCollection = db.Categories.ToList<Category>();
+                transaction.Tracker = (from t in db.Trackers where t.Id == id select t).First();
                 return PartialView(transaction);
+            }                
         }
 
         public ActionResult AddRecurringPayment(int id)
         {
-            var tracker = (from t in db.Trackers where t.Id == id select t).First(); //populate tracker field
             TransactionViewModel transaction = new TransactionViewModel();
             transaction.CategoryCollection = db.Categories.ToList<Category>();
             transaction.PeriodCollection = db.Periods.ToList<Period>();
-            transaction.Tracker = tracker;
+            transaction.Tracker = (from t in db.Trackers where t.Id == id select t).First();
             return PartialView(transaction);
         }
 
@@ -148,6 +148,9 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
+                model.CategoryCollection = db.Categories.ToList<Category>();
+                model.PeriodCollection = db.Periods.ToList<Period>();
+                model.Tracker = (from t in db.Trackers where t.Id == id select t).First();
                 return PartialView(model);
             }
         }        
@@ -248,7 +251,7 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                return PartialView(tracker);
             }
         }
         

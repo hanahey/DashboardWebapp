@@ -44,7 +44,7 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                return PartialView(model);
             }
         }
 
@@ -70,7 +70,7 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                return PartialView(category);
             }
         }
 
@@ -94,7 +94,7 @@ namespace DashboardWebapp.Controllers
             }
             catch
             {
-                return PartialView();
+                return PartialView(category);
             }
         }
     }

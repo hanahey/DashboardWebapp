@@ -65,7 +65,7 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                return PartialView(model);
             }
         }
 
@@ -102,7 +102,8 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                ViewBag.EndDate = ((DateTime)(tracker.EndDate)).ToString("yyyy-MM-dd");
+                return PartialView(tracker);
             }
         }
 
@@ -126,7 +127,7 @@ namespace DashboardWebapp.Controllers
             }
             catch
             {
-                return PartialView();
+                return PartialView(model);
             }
         }
     }

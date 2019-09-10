@@ -106,7 +106,10 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                model.CategoryCollection = db.Categories.ToList<Category>();
+                model.PeriodCollection = db.Periods.ToList<Period>();
+                model.TrackerCollection = db.Trackers.ToList<Tracker>();
+                return PartialView(model);
             }
         }
 
@@ -128,9 +131,10 @@ namespace DashboardWebapp.Controllers
                                                     RecurringTransactionId = t.RecurringTransactionId,
                                                     TrackerId = t.TrackerId,
                                                 }).First();
-            if (transaction.Amount < 0)
+
+            if (transaction.Amount <0)
             {
-                transaction.Amount = -transaction.Amount;
+                transaction.Amount = -(transaction.Amount);
                 transaction.Direction = "Out";
             }
             else
@@ -164,29 +168,24 @@ namespace DashboardWebapp.Controllers
         public ActionResult EditTransaction(int id, TransactionViewModel model)
         {
             var transaction = (from t in db.Transactions where t.Id == id select t).First();
-            var recurringTransaction = (from t in db.RecurringTransactions where t.Id == transaction.RecurringTransactionId select t).First();
-            var firstTransaction = (from x in recurringTransaction.Transactions orderby x.Date select x).First();
-
-             //set the Start Date as the Date for a recurring transaction without any other transactions
-            if (transaction.RecurringTransaction.PeriodId > 0 && ((transaction.RecurringTransaction.Transactions.Count == 1) ||
-               ((transaction.RecurringTransaction.Transactions.Count > 1) && (transaction == firstTransaction))))
-            {
-                transaction.Date = (DateTime)model.StartDate;
-            }
-            else
-                transaction.Date = model.Date;
-
-            if (model.Direction == "Out") 
-                model.Amount = -(model.Amount);
-            transaction.Name = model.Name;
-            transaction.Amount = model.Amount; 
-            
-            transaction.TrackerId = model.TrackerId;
-            transaction.CategoryId = model.CategoryId;
-            // transaction.RecurringTransactionId = model.RecurringTransactionId; -- read only
-
+            transaction.Date = model.Date;
             if (transaction.RecurringTransactionId != null)
-            {                
+            {
+                var recurringTransaction = (from t in db.RecurringTransactions where t.Id == transaction.RecurringTransactionId select t).First();
+                var firstTransaction = (from x in recurringTransaction.Transactions orderby x.Date select x).First();
+
+                //set the Start Date as the Date for a recurring transaction without any other transactions
+                if (transaction.RecurringTransaction.PeriodId > 0 && ((transaction.RecurringTransaction.Transactions.Count == 1) ||
+                   ((transaction.RecurringTransaction.Transactions.Count > 1) && (transaction == firstTransaction))))
+                {
+                    if (model.StartDate !=null)
+                    {
+                        transaction.Date = (DateTime)model.StartDate;
+                    }                    
+                }
+                else
+                    transaction.Date = model.Date;
+
                 recurringTransaction.Name = model.Name;
                 if (model.StartDate != null)
                     recurringTransaction.StartDate = (DateTime)model.StartDate;
@@ -208,6 +207,14 @@ namespace DashboardWebapp.Controllers
                 }
             }
 
+            if (model.Direction == "Out") 
+                model.Amount = -(model.Amount);
+            transaction.Name = model.Name;
+            transaction.Amount = model.Amount; 
+            
+            transaction.TrackerId = model.TrackerId;
+            transaction.CategoryId = model.CategoryId;
+
             if (ModelState.IsValid)
             {
                 db.SaveChanges();
@@ -216,7 +223,15 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView();
+                model.CategoryCollection = db.Categories.ToList<Category>();
+                model.PeriodCollection = db.Periods.ToList<Period>();
+                model.TrackerCollection = db.Trackers.ToList<Tracker>();
+                ViewBag.Date = model.Date.ToString("yyyy-MM-dd");
+                if (model.StartDate !=null)
+                    ViewBag.StartDate = ((DateTime)(model.StartDate)).ToString("yyyy-MM-dd");
+                if (model.EndDate != null)
+                    ViewBag.EndDate = ((DateTime)(model.EndDate)).ToString("yyyy-MM-dd"); 
+                return PartialView(model);
             }
         }
 
@@ -250,7 +265,7 @@ namespace DashboardWebapp.Controllers
             }
             catch
             {
-                return PartialView();
+                return PartialView(transaction);
             }
         }
     }

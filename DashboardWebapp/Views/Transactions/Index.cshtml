@@ -74,8 +74,7 @@
                     <td>
                         @if (item.Amount < 0)
                         {
-                            item.Amount = -(item.Amount);
-                            @Html.DisplayFor(modelItem => item.Amount)
+                            @((-item.Amount).ToString("N2"))
                         }
                         else
                         {
