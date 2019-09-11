@@ -5,19 +5,14 @@
 <br />
 <br />
 
-@*placeholder*@
 <div class="row">
     <div class="col-md-6">
-        @{Html.RenderAction("Trackers", "Home");}
+        @{Html.RenderAction("CashFlow", "Home");}
     </div>
-    @*<div class="col-md-6 col-md-offset-6">
-        @{Html.RenderAction("Trackers", "Categories");}
-    </div>*@
+    <div class="col-md-6">
+              @{Html.RenderAction("Trackers", "Home");}
+        </div>
 </div>
-
-@*<div> @Html.Partial("_Comments") </div>
-<div> @{Html.RenderPartial("_Comments");} </div>*@
-
 
 @*<div class="row">
     <div class="col-md-4">

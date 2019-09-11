@@ -16,7 +16,7 @@ namespace DashboardWebapp.Controllers
         // GET: Transactions
         public ActionResult Index()
         {
-            var transactions = from t in db.Transactions orderby t.Id descending 
+            var transactions = from t in db.Transactions orderby t.Date descending 
                                select new TransactionViewModel
                                {
                                    Id = t.Id,
@@ -27,8 +27,6 @@ namespace DashboardWebapp.Controllers
                                    Tracker = t.Tracker,
                                    RecurringTransaction = t.RecurringTransaction,
                                };
-
-            // retrieve Period --> from recurring transaction
             return View(transactions);
         }
 
@@ -38,7 +36,22 @@ namespace DashboardWebapp.Controllers
             TransactionViewModel transaction = new TransactionViewModel();
             transaction.CategoryCollection = db.Categories.ToList<Category>();
             transaction.PeriodCollection = db.Periods.ToList<Period>();
-            transaction.TrackerCollection = db.Trackers.ToList<Tracker>();
+
+            //get TrackerCollection WITHOUT Trackers with a current RecurringTransaction:
+            List<Tracker> TrackerCollectionList = db.Trackers.ToList<Tracker>();
+            //NOTE: take from TRANSACTION db because that is the table linked to the Tracker table
+            var recurringTransactionwithTracker = (from t in db.Transactions
+                                                   where t.RecurringTransaction != null
+                                                   && (t.RecurringTransaction.EndDate == null ||
+                                                   t.RecurringTransaction.EndDate > DateTime.Now)
+                                                   select t).ToList();
+
+            foreach (var t in recurringTransactionwithTracker)
+            {
+                if (TrackerCollectionList.Contains(t.Tracker))
+                    TrackerCollectionList.Remove(t.Tracker);
+            }
+            transaction.TrackerCollection = TrackerCollectionList;
 
             return PartialView(transaction);
         }
@@ -108,7 +121,19 @@ namespace DashboardWebapp.Controllers
             {
                 model.CategoryCollection = db.Categories.ToList<Category>();
                 model.PeriodCollection = db.Periods.ToList<Period>();
-                model.TrackerCollection = db.Trackers.ToList<Tracker>();
+                List<Tracker> TrackerCollectionList = db.Trackers.ToList<Tracker>();
+                var recurringTransactionwithTracker = (from t in db.Transactions
+                                                       where t.RecurringTransaction != null
+                                                       && (t.RecurringTransaction.EndDate == null ||
+                                                       t.RecurringTransaction.EndDate > DateTime.Now)
+                                                       select t).ToList();
+
+                foreach (var t in recurringTransactionwithTracker)
+                {
+                    if (TrackerCollectionList.Contains(t.Tracker))
+                        TrackerCollectionList.Remove(t.Tracker);
+                }
+                model.TrackerCollection = TrackerCollectionList;
                 return PartialView(model);
             }
         }
@@ -144,6 +169,24 @@ namespace DashboardWebapp.Controllers
             transaction.CategoryCollection = db.Categories.ToList<Category>();
             transaction.PeriodCollection = db.Periods.ToList<Period>();
             transaction.TrackerCollection = db.Trackers.ToList<Tracker>();
+
+            //get TrackerCollection WITHOUT Trackers with a current RecurringTransaction:
+            //EXCEPT FOR THIS TRACKER [IF ANY] IF IT IS A RECURRING TRANSACTION
+            List<Tracker> TrackerCollectionList = db.Trackers.ToList<Tracker>();
+            //NOTE: take from TRANSACTION db because that is the table linked to the Tracker table
+            var recurringTransactionwithTracker = (from t in db.Transactions
+                                                   where t.RecurringTransaction != null
+                                                   && t.TrackerId != transaction.TrackerId
+                                                   && (t.RecurringTransaction.EndDate == null ||
+                                                   t.RecurringTransaction.EndDate > DateTime.Now)
+                                                   select t).ToList();
+
+            foreach (var t in recurringTransactionwithTracker)
+            {
+                if (TrackerCollectionList.Contains(t.Tracker))
+                    TrackerCollectionList.Remove(t.Tracker);
+            }
+            transaction.TrackerCollection = TrackerCollectionList;
 
             ViewBag.Date = transaction.Date.ToString("yyyy-MM-dd"); //to pre-populate datepicker
 
@@ -225,12 +268,25 @@ namespace DashboardWebapp.Controllers
             {
                 model.CategoryCollection = db.Categories.ToList<Category>();
                 model.PeriodCollection = db.Periods.ToList<Period>();
-                model.TrackerCollection = db.Trackers.ToList<Tracker>();
+                List<Tracker> TrackerCollectionList = db.Trackers.ToList<Tracker>();
+                var recurringTransactionwithTracker = (from t in db.Transactions
+                                                       where t.RecurringTransaction != null
+                                                       && t.TrackerId != transaction.TrackerId
+                                                       && (t.RecurringTransaction.EndDate == null ||
+                                                       t.RecurringTransaction.EndDate > DateTime.Now)
+                                                       select t).ToList();
+                foreach (var t in recurringTransactionwithTracker)
+                {
+                    if (TrackerCollectionList.Contains(t.Tracker))
+                        TrackerCollectionList.Remove(t.Tracker);
+                }
+                model.TrackerCollection = TrackerCollectionList;
+
                 ViewBag.Date = model.Date.ToString("yyyy-MM-dd");
                 if (model.StartDate !=null)
                     ViewBag.StartDate = ((DateTime)(model.StartDate)).ToString("yyyy-MM-dd");
                 if (model.EndDate != null)
-                    ViewBag.EndDate = ((DateTime)(model.EndDate)).ToString("yyyy-MM-dd"); 
+                    ViewBag.EndDate = ((DateTime)(model.EndDate)).ToString("yyyy-MM-dd");                
                 return PartialView(model);
             }
         }

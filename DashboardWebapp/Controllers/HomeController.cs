@@ -17,7 +17,163 @@ namespace DashboardWebapp.Controllers
         {
             return View();
         }
-        
+
+        //Cash flow methods:
+        public ActionResult CashFlow()
+        {
+            var thisMonth = DateTime.Now.Month;
+            var transactions = from t in db.Transactions where t.Date.Month == thisMonth
+                               orderby t.Date descending
+                               select new TransactionViewModel
+                               {
+                                   Id = t.Id,
+                                   Name = t.Name,
+                                   Date = t.Date,
+                                   Amount = t.Amount,
+                                   Category = t.Category,
+                                   Tracker = t.Tracker,
+                               };
+            //value for 'IN'
+            ViewBag.CashFlowIn = (from t in transactions where t.Amount > 0 select t.Amount).Sum();
+            //value for 'OUT'
+            var cashFlowOut = from t in transactions where t.Amount < 0 select t;
+            double cashFlowOutTotal = 0;
+            foreach (TransactionViewModel t in cashFlowOut)
+            {
+                double thisOutAmount = -t.Amount;
+                cashFlowOutTotal += thisOutAmount;
+            }
+            ViewBag.CashFlowOut = cashFlowOutTotal;
+
+            //value for trackers
+            var cashFlowTrackers = from t in transactions where t.Amount < 0 && t.Tracker != null select t;
+            double cashFlowTrackersTotal = 0;
+            foreach (TransactionViewModel t in cashFlowTrackers)
+            {
+                double thisTrackerAmount = -t.Amount;
+                cashFlowTrackersTotal += thisTrackerAmount;
+            }
+            ViewBag.CashFlowTrackers = cashFlowTrackersTotal;
+
+            //value for expenses
+            var cashFlowExpenses = from t in transactions where t.Amount < 0 && t.Tracker == null select t;
+            double cashFlowExpensesTotal = 0;
+            foreach (TransactionViewModel t in cashFlowExpenses)
+            {
+                double thisCashFlowExpense = -t.Amount;
+                cashFlowExpensesTotal += thisCashFlowExpense;
+            }
+            ViewBag.CashFlowExpenses = cashFlowExpensesTotal;
+
+            return PartialView(transactions); 
+        }
+
+        public ActionResult AddTransaction()
+        {
+            TransactionViewModel transaction = new TransactionViewModel();
+            transaction.CategoryCollection = db.Categories.ToList<Category>();
+            transaction.PeriodCollection = db.Periods.ToList<Period>();
+
+            //get TrackerCollection WITHOUT Trackers with a current RecurringTransaction:            
+            List<Tracker>TrackerCollectionList = db.Trackers.ToList<Tracker>();
+            //NOTE: take from TRANSACTION db because that is the table linked to the Tracker table
+            var recurringTransactionwithTracker = (from t in db.Transactions
+                                                  where t.RecurringTransaction != null
+                                                  && (t.RecurringTransaction.EndDate == null ||
+                                                  t.RecurringTransaction.EndDate > DateTime.Now) select t).ToList();
+
+            foreach (var t in recurringTransactionwithTracker)
+            {
+                if (TrackerCollectionList.Contains(t.Tracker))
+                    TrackerCollectionList.Remove(t.Tracker);
+            }
+            transaction.TrackerCollection = TrackerCollectionList;
+
+            return PartialView(transaction);
+        }
+
+        // POST: Transactions/Create
+        [HttpPost]
+        public ActionResult AddTransaction(TransactionViewModel model)
+        {
+            //get logged in user
+            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
+                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
+            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
+
+            Period selectedPeriod = null; //set selected period to null to avoid null reference error when checking period id
+            if (model.PeriodId > 0)
+            {
+                selectedPeriod = (from p in db.Periods where p.Id == model.PeriodId select p).First();
+            }
+
+            if (model.Direction == "Out") //append negative symbol to Amount if money is going out
+            {
+                model.Amount = -model.Amount;
+            }
+
+            if (ModelState.IsValid)
+            {
+                if (selectedPeriod == null)
+                {
+                    var transaction = new Transaction
+                    {
+                        Name = model.Name,
+                        Amount = model.Amount,
+                        Date = model.Date,
+                        CategoryId = model.CategoryId,
+                        TrackerId = model.TrackerId,
+                        PersonId = currentPersonId,
+                    };
+                    db.Transactions.Add(transaction);
+                }
+                else //add RecurringTransactionId + RecurringTransaction record if needed
+                {
+                    var recurringTransaction = new RecurringTransaction
+                    {
+                        Name = model.Name,
+                        StartDate = (DateTime)model.StartDate,
+                        EndDate = model.EndDate,
+                        PeriodId = (int)model.PeriodId,
+                    };
+                    db.RecurringTransactions.Add(recurringTransaction);
+
+                    var transaction = new Transaction
+                    {
+                        Name = model.Name,
+                        Amount = model.Amount,
+                        Date = (DateTime)model.StartDate,
+                        CategoryId = model.CategoryId,
+                        TrackerId = model.TrackerId,
+                        PersonId = currentPersonId,
+                        RecurringTransactionId = recurringTransaction.Id
+                    };
+                    db.Transactions.Add(transaction);
+                }
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                model.CategoryCollection = db.Categories.ToList<Category>();
+                model.PeriodCollection = db.Periods.ToList<Period>();
+                List<Tracker> TrackerCollectionList = db.Trackers.ToList<Tracker>();
+                var recurringTransactionwithTracker = (from t in db.Transactions
+                                                       where t.RecurringTransaction != null
+                                                       && (t.RecurringTransaction.EndDate == null ||
+                                                       t.RecurringTransaction.EndDate > DateTime.Now)
+                                                       select t).ToList();
+
+                foreach (var t in recurringTransactionwithTracker)
+                {
+                    if (TrackerCollectionList.Contains(t.Tracker))
+                        TrackerCollectionList.Remove(t.Tracker);
+                }
+                model.TrackerCollection = TrackerCollectionList;
+                return PartialView(model);
+            }
+        }
+
         //Tracker methods:
         public ActionResult Trackers()
         {
@@ -276,6 +432,7 @@ namespace DashboardWebapp.Controllers
                 return PartialView();
             }
         }
+        
 
         //public ActionResult About()
         //{

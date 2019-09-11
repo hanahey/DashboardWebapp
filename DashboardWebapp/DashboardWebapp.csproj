@@ -321,6 +321,8 @@
     <Content Include="Views\Home\AddTracker.cshtml" />
     <Content Include="Views\Home\DeleteTracker.cshtml" />
     <Content Include="Views\Home\EditTracker.cshtml" />
+    <Content Include="Views\Home\CashFlow.cshtml" />
+    <Content Include="Views\Home\AddTransaction.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
