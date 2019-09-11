@@ -22,7 +22,7 @@
         <div class="form-group" id="dateDiv">
             @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
             <div class="col-md-8">
-                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker", @id = "selectedDate" } })
+                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker", @id = "selectedDate", @Value = DateTime.Now.ToString("yyyy-MM-dd") } })
                 @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
             </div>
         </div>

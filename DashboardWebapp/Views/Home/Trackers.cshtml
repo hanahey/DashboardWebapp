@@ -103,7 +103,7 @@
 </div>
 
 <!-- Edit Tracker Modal -->
-<div class="modal fade" id="EditModal" role="dialog">
+<div class="modal fade" id="EditTrackerModal" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
@@ -112,7 +112,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title" style="text-align:center"><b>Edit Tracker</b></h4>
             </div>
-            <div class="modal-body" id="EditPreview">
+            <div class="modal-body" id="EditTrackerPreview">
             </div>
 
         </div>
@@ -121,7 +121,7 @@
 </div>
 
 <!-- Delete Tracker Modal -->
-<div class="modal fade" id="DeleteModal" role="dialog">
+<div class="modal fade" id="DeleteTrackerModal" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
@@ -130,14 +130,14 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title" style="text-align:center"><b>Delete Tracker</b></h4>
             </div>
-            <div class="modal-body" id="DeletePreview">
+            <div class="modal-body" id="DeleteTrackerPreview">
             </div>
         </div>
     </div>
 </div>
 
 <!-- Add Tracker Modal -->
-<div class="modal fade" id="AddModal" role="dialog">
+<div class="modal fade" id="AddTrackerModal" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
@@ -146,7 +146,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title" style="text-align:center"><b>Add Tracker</b></h4>
             </div>
-            <div class="modal-body" id="AddPreview">
+            <div class="modal-body" id="AddTrackerPreview">
             </div>
         </div>
     </div>
@@ -200,22 +200,6 @@
     </div>
 </div>
 
-<!-- Delete Tracker Modal -->
-<div class="modal fade" id="DeleteModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#286090; color:white">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" style="text-align:center"><b>Delete Tracker</b></h4>
-            </div>
-            <div class="modal-body" id="DeletePreview">
-            </div>
-        </div>
-    </div>
-</div>
-
 <script type="text/javascript">
       function OpenEditModal(currentId) {
         $.ajax({
@@ -223,8 +207,8 @@
             url: '@Url.Action("EditTracker", "Home")',
             data: { id: currentId },
             success: function (data) {
-                $('#EditPreview').html(data);
-                $('#EditModal').modal('show');
+                $('#EditTrackerPreview').html(data);
+                $('#EditTrackerModal').modal('show');
             }
         })
     }
@@ -234,8 +218,8 @@
             url: '@Url.Action("DeleteTracker", "Home")',
             data: { id: currentId },
             success: function (data) {
-                $('#DeletePreview').html(data);
-                $('#DeleteModal').modal('show');
+                $('#DeleteTrackerPreview').html(data);
+                $('#DeleteTrackerModal').modal('show');
             }
         })
     }
@@ -245,8 +229,8 @@
             url: '@Url.Action("AddTracker", "Home")',
             data: null,
             success: function (data) {
-                $('#AddPreview').html(data);
-                $('#AddModal').modal('show');
+                $('#AddTrackerPreview').html(data);
+                $('#AddTrackerModal').modal('show');
             }
         })
     }
@@ -283,43 +267,23 @@
             }
         })
     }
-
 </script>
 
 <style>
-    #AddModal {
-        height: 400px;
-        top: calc(50% - 200px) !important;
-    }
-
-    #OTPModal {
-        height: 450px;
-        top: calc(45% - 200px) !important;
-    }
-
-    #StopRPModal {
-        height: 450px;
-        top: calc(60% - 200px) !important;
-    }
-
     .title {
         padding: 5px;
         text-align: center;
     }
-
     .table {
         display: table;
         width: 100%;
         font-weight: bold;
         font-size: medium;
     }
-
     .tr {
         display: table-row;
     }
-
     .table-cell {
         display: table-cell;
     }
 </style>
-

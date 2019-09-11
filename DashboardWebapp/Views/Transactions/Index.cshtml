@@ -71,7 +71,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Date)
                     </td>
-                    <td>
+                    <td style="min-width:90px">
                         @if (item.Amount < 0)
                         {
                             @((-item.Amount).ToString("N2"))
@@ -109,13 +109,13 @@
                             @frequency
                         }
                     </td>
-                    <td>
+                    <td style="min-width:85px">
                         @if (item.RecurringTransaction != null)
                         {
                             @Html.DisplayFor(modelItem => item.RecurringTransaction.StartDate)
                         }
                     </td>
-                    <td>
+                    <td style="min-width:85px">
                         @if (item.RecurringTransaction != null)
                         {
                             @Html.DisplayFor(modelItem => item.RecurringTransaction.EndDate)
@@ -223,10 +223,3 @@
         })
     }
 </script>
-
-<style>
-    .modal-dialog {
-        height: 400px;
-        top: calc(35% - 200px) !important;
-    }
-</style>
