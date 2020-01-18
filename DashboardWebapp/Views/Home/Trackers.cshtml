@@ -71,7 +71,7 @@
                         &ensp;
                         <text> £ @((item.GoalAmount - item.AmountSaved).ToString("N2"))</text>
                         and
-                        @((item.GoalDate - item.StartDate).TotalDays) Days Remaining
+                        @((item.GoalDate - DateTime.Now.Date).TotalDays) Days Remaining
                     </div>
                 </div>
             </div>
