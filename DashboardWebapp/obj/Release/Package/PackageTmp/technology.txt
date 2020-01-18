@@ -1,5 +1,0 @@
-﻿﻿technology used: 
-- ASP.NET MVC (Razor)
-- ASP.NET Identity
-- Entity Framework
-- Microsoft SQL Server Management Studio 2017
