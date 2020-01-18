@@ -1,0 +1,208 @@
+﻿@model IEnumerable<DashboardWebapp.Models.Tracker>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+
+<h4>
+    <a onclick="OpenAddModal()" style="cursor:pointer">
+        <img src="@Url.Content("~/Images/add-button.png")" style="width:40px;height:40px;" />
+        Add Tracker
+    </a>
+</h4>
+
+<h2>Trackers</h2>
+
+@{int count = 0;}
+
+<div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    No.
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GoalAmount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GoalDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EndDate)
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                    using (Html.BeginForm("Delete", "Trackers", new { id = item.Id }))
+                    {
+                        <tr>
+                            <td>
+                                @{ count = count + 1;}
+                                @count
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.GoalAmount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StartDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.GoalDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.EndDate)
+                            </td>
+                            <td>
+                                @if (item.Transactions.Count != 0)
+                                {
+                                    <a onclick="OpenDetailsModal(@item.Id)" style="cursor:pointer">Transactions</a>
+                                }
+                                else
+                                {
+                                    <span title="This tracker has no transactions">Transactions</span>
+                                }
+                                &nbsp;
+                                <a onclick="OpenEditModal(@item.Id)" style="cursor:pointer">Edit</a> &nbsp;
+                                &nbsp;
+                                <a onclick="OpenDeleteModal(@item.Id)" style="cursor:pointer;color:#C00000">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Edit Tracker Modal -->
+<div class="modal fade" id="EditModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#286090; color:white">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="text-align:center"><b>Edit Tracker</b></h4>
+            </div>
+            <div class="modal-body" id="EditPreview">
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Delete Tracker Modal -->
+<div class="modal fade" id="DeleteModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#286090; color:white">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="text-align:center"><b>Delete Tracker</b></h4>
+            </div>
+            <div class="modal-body" id="DeletePreview">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Tracker Modal -->
+<div class="modal fade" id="AddModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#286090; color:white">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="text-align:center"><b>Add Tracker</b></h4>
+            </div>
+            <div class="modal-body" id="AddPreview">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tracker Transactions Modal -->
+<div class="modal fade" id="DetailsModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#286090; color:white">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="text-align:center"><b>Transactions</b></h4>
+            </div>
+            <div class="modal-body" id="DetailsPreview">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    function OpenEditModal(currentId) {
+        $.ajax({
+            type: "Get",
+            url: '@Url.Action("EditTracker", "Trackers")',
+            data: { id: currentId },
+            success: function (data) {
+                $('#EditPreview').html(data);
+                $('#EditModal').modal('show');
+            }
+        })
+    }
+    function OpenDeleteModal(currentId) {
+        $.ajax({
+            type: "Get",
+            url: '@Url.Action("DeleteTracker", "Trackers")',
+            data: { id: currentId },
+            success: function (data) {
+                $('#DeletePreview').html(data);
+                $('#DeleteModal').modal('show');
+            }
+        })
+    }
+     function OpenAddModal() {
+        $.ajax({
+            type: "Get",
+            url: '@Url.Action("AddTracker", "Trackers")',
+            data: null,
+            success: function (data) {
+                $('#AddPreview').html(data);
+                $('#AddModal').modal('show');
+            }
+        })
+    }
+    function OpenDetailsModal(currentId) {
+        $.ajax({
+            type: "Get",
+            url: '@Url.Action("TrackerTransactions", "Trackers")',
+            data: { id: currentId },
+            success: function (data) {
+                $('#DetailsPreview').html(data);
+                $('#DetailsModal').modal('show');
+            }
+        })
+    }
+</script>

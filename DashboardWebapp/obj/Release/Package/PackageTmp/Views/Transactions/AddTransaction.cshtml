@@ -1,0 +1,137 @@
+﻿@model DashboardWebapp.Models.TransactionViewModel
+
+
+@{
+    ViewBag.Title = "AddTransaction";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group" id="dateDiv">
+            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker", @id = "selectedDate", @Value = DateTime.Now.ToString("yyyy-MM-dd") } })
+                @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control", @Value = "" } })
+                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.CategoryCollection, "Id", "Name"), "Select", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Direction, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.RadioButtonFor(m => m.Direction, "In", new { @id = "directionIn" }) In &nbsp;
+                @Html.RadioButtonFor(m => m.Direction, "Out", new { @checked = "checked", @id = "directionOut" }) Out
+                @Html.ValidationMessageFor(model => model.Direction, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PeriodId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.DropDownListFor(model => model.PeriodId, new SelectList(Model.PeriodCollection, "Id", "Name"), "Single", new { @class = "form-control", @onChange = "hideShowStartEndDate(this)" })
+                @Html.ValidationMessageFor(model => model.PeriodId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*Display only when Period is NOT "Single -- will be pre-populated with the "Date" value, if any"*@
+        <div class="form-group" id="startDateDiv" style="display:none">
+            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker", @id = "startDate" } })
+                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*Display only when Period is NOT "Single"*@
+        <div class="form-group" id="endDateDiv" style="display:none">
+            @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @type = "date", @class = "form-control datepicker" } })
+                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TrackerId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.DropDownListFor(model => model.TrackerId, new SelectList(Model.TrackerCollection, "Id", "Name"), "None", new { @class = "form-control", @id = "tracker", @onChange = "enableDisableDirection(this)" })
+                @Html.ValidationMessageFor(model => model.TrackerId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8">
+                <input type="submit" value="Add" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function hideShowStartEndDate(e) {
+        var periodId = $(e).find('option:selected').val();
+        var endDateDiv = document.getElementById('endDateDiv');
+        var startDateDiv = document.getElementById('startDateDiv');
+        var dateDiv = document.getElementById('dateDiv');
+        var selectedDate = document.getElementById('selectedDate');
+        var startDate = document.getElementById('startDate');
+
+        if (periodId > 0) {
+            endDateDiv.style.display = 'block';
+            startDateDiv.style.display = 'block';
+            dateDiv.style.display = 'none';
+            startDate.value = selectedDate.value;
+        }
+        else {
+            endDateDiv.style.display = 'none';
+            startDateDiv.style.display = 'none';
+            dateDiv.style.display = 'block';
+        }
+    }
+    function enableDisableDirection(e) {
+        var tracker = document.getElementById('tracker');
+        var directionOut = document.getElementById('directionOut');
+        var directionIn = document.getElementById('directionIn');
+        var trackerId = $(e).find('option:selected').val();
+        if (trackerId > 0) {
+            directionOut.checked = "true";
+            directionOut.disabled = "disabled";
+            directionIn.disabled = "disabled";
+        }
+        else {
+            directionOut.removeAttribute("disabled");
+            directionIn.removeAttribute("disabled");
+        }
+    }
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

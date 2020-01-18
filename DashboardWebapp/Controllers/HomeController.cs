@@ -34,7 +34,25 @@ namespace DashboardWebapp.Controllers
                                    Tracker = t.Tracker,
                                };
             //value for 'IN'
-            ViewBag.CashFlowIn = (from t in transactions where t.Amount > 0 select t.Amount).Sum();
+            var cashFlowIn = from t in transactions where t.Amount > 0 select t;
+            //ViewBag.CashFlowIn = (from t in transactions where t.Amount > 0 select t.Amount).Sum();
+            ViewBag.CashFlowIn = 0;
+            double cashFlowInTotal=0;
+
+            foreach (TransactionViewModel t in cashFlowIn)
+            {
+                double thisinAmount = 0;
+                if (t !=null)
+                {
+                    thisinAmount = t.Amount;
+                }
+                
+                cashFlowInTotal += thisinAmount;
+            }
+
+            ViewBag.CashFlowIn = cashFlowInTotal;
+
+
             //value for 'OUT'
             var cashFlowOut = from t in transactions where t.Amount < 0 select t;
             double cashFlowOutTotal = 0;
