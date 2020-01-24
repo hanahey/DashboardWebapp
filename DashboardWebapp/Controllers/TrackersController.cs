@@ -13,11 +13,17 @@ namespace DashboardWebapp.Controllers
     public class TrackersController : Controller
     {
         DashboardContext db = new DashboardContext();
+        static int currentPersonId;
 
         public ActionResult Index()
         {
+            //get logged in user
+            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
+                 GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
+            currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
+
             var trackers = from t in db.Trackers
-                             select t;
+                           where t.PersonId == currentPersonId select t;
             return View(trackers);
         }
 
@@ -44,10 +50,6 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult AddTracker(Tracker model)
         {
-            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
-                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
-            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
-
             if (ModelState.IsValid)
             {
                 var tracker = new Tracker

@@ -24,6 +24,8 @@ namespace DashboardWebapp.Models
         [Display(Name = "Date")]
         public DateTime Date { get; set; }
 
+        public string Company { get; set; }
+
         [Display(Name = "Category")]
         public int? CategoryId { get; set; }
 

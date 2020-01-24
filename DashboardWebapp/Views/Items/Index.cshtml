@@ -1,8 +1,7 @@
-﻿@model IEnumerable<DashboardWebapp.Models.TransactionViewModel>
-
+﻿@model IEnumerable<DashboardWebapp.Models.Item>
 
 @{
-    ViewBag.Title = "Transactions";
+    ViewBag.Title = "Price List";
 }
 
 @{int count = 0;}
@@ -12,7 +11,7 @@
 <h4>
     <a onclick="OpenAddModal()" style="cursor:pointer">
         <img src="@Url.Content("~/Images/add-button.png")" style="width:40px;height:40px;" />
-        Add Transaction
+        Add Item
     </a>
 </h4>
 
@@ -26,37 +25,25 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                @Html.DisplayNameFor(model => model.Quantity)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Amount)
+                @Html.DisplayNameFor(model => model.Measurement)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Company)
+                @Html.DisplayNameFor(model => model.Price) (£)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.Store)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Direction)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PeriodId)
-            </th>
-            <th>
-                Start Date
-            </th>
-            <th>
-                End Date
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tracker)
+                @Html.DisplayNameFor(model => model.CategoryId)
             </th>
             <th>
                 Actions
             </th>
         </tr>
-    </thead>
+        </thead>
     <tbody>
         @if (Model != null)
         {
@@ -67,69 +54,23 @@
                         @{ count = count + 1;}
                         @count
                     </td>
-                    <td style="max-width:160px">
+                    <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
-
                     <td>
-                        @Html.DisplayFor(modelItem => item.Date)
+                        @Html.DisplayFor(modelItem => item.Quantity)
                     </td>
-                    <td style="min-width:90px">
-                        @if (item.Amount < 0)
-                        {
-                            @((-item.Amount).ToString("N2"))
-                        }
-                        else
-                        {
-                            @Html.DisplayFor(modelItem => item.Amount)
-                        }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Measurement)
                     </td>
-
-                    <td style="max-width:160px">
-                        @Html.DisplayFor(modelItem => item.Company)
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
                     </td>
-
-                    <td style="max-width:160px">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Store)
+                    </td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.Category.Name)
-                    </td>
-
-                    <td>
-                        @if (item.Amount < 0)
-                        {
-                            item.Direction = "Out";
-                        }
-                        else
-                        {
-                            item.Direction = "In";
-                        }
-                        @Html.DisplayFor(modelItem => item.Direction)
-                    </td>
-
-                    <td>
-                        @if (item.RecurringTransaction != null)
-                        {
-                            @Html.DisplayFor(modelItem => item.RecurringTransaction.Period.Name)
-                        }
-                        else
-                        {
-                            string frequency = "Single";
-                            @frequency
-                        }
-                    </td>
-                    <td style="min-width:85px">
-                        @if (item.RecurringTransaction != null)
-                        {
-                            @Html.DisplayFor(modelItem => item.RecurringTransaction.StartDate)
-                        }
-                    </td>
-                    <td style="min-width:85px">
-                        @if (item.RecurringTransaction != null)
-                        {
-                            @Html.DisplayFor(modelItem => item.RecurringTransaction.EndDate)
-                        }
-                    </td>
-                    <td style="max-width:160px">
-                        @Html.DisplayFor(modelItem => item.Tracker.Name)
                     </td>
                     <td>
                         <a onclick="OpenEditModal(@item.Id)" style="cursor:pointer">Edit</a> &nbsp;
@@ -141,7 +82,7 @@
     </tbody>
 </table>
 
-<!-- Edit Transaction Modal -->
+<!-- Edit Item Modal -->
 <div class="modal fade" id="EditModal" role="dialog">
     <div class="modal-dialog">
 
@@ -149,7 +90,7 @@
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" style="text-align:center"><b>Edit Transaction</b></h4>
+                <h4 class="modal-title" style="text-align:center"><b>Edit Item</b></h4>
             </div>
             <div class="modal-body" id="EditPreview">
             </div>
@@ -157,16 +98,15 @@
     </div>
 </div>
 
-<!-- Delete Transaction Modal -->
+<!-- Delete Item Modal -->
 <div class="modal fade" id="DeleteModal" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
-                @*3 Sep: the exact shade of blue to match btn-primary*@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" style="text-align:center"><b>Delete Transaction</b></h4>
+                <h4 class="modal-title" style="text-align:center"><b>Delete Item</b></h4>
             </div>
             <div class="modal-body" id="DeletePreview">
             </div>
@@ -174,7 +114,7 @@
     </div>
 </div>
 
-<!-- Add Transaction Modal -->
+<!-- Add Item Modal -->
 <div class="modal fade" id="AddModal" role="dialog">
     <div class="modal-dialog">
 
@@ -182,7 +122,7 @@
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" style="text-align:center"><b>Add Transaction</b></h4>
+                <h4 class="modal-title" style="text-align:center"><b>Add Item</b></h4>
             </div>
             <div class="modal-body" id="AddPreview">
             </div>
@@ -199,7 +139,7 @@
     function OpenEditModal(currentId) {
         $.ajax({
             type: "Get",
-            url: '@Url.Action("EditTransaction", "Transactions")',
+            url: '@Url.Action("EditItem", "Items")',
             data: { id: currentId },
             success: function (data) {
                 $('#EditPreview').html(data);
@@ -210,7 +150,7 @@
     function OpenDeleteModal(currentId) {
         $.ajax({
             type: "Get",
-            url: '@Url.Action("DeleteTransaction", "Transactions")',
+            url: '@Url.Action("DeleteItem", "Items")',
             data: { id: currentId },
             success: function (data) {
                 $('#DeletePreview').html(data);
@@ -221,7 +161,7 @@
      function OpenAddModal() {
         $.ajax({
             type: "Get",
-            url: '@Url.Action("AddTransaction", "Transactions")',
+            url: '@Url.Action("AddItem", "Items")',
             data: null,
             success: function (data) {
                 $('#AddPreview').html(data);

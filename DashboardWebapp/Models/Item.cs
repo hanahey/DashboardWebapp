@@ -6,28 +6,30 @@ namespace DashboardWebapp.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Transaction")]
-    public partial class Transaction
+    [Table("Item")]
+    public partial class Item
     {
         public int Id { get; set; }
 
         [Required]
         [StringLength(50)]
+        [Display(Name = "Details")]
         public string Name { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:N2}")]
-        public double Amount { get; set; }
+        public double Price { get; set; }
 
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
-        public DateTime Date { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Store { get; set; }
 
-        public string Company { get; set; }
+        public int Quantity { get; set; }
 
+        [StringLength(50)]
+        public string Measurement { get; set; }
+
+        [Display(Name = "Category")]
         public int? CategoryId { get; set; }
-
-        public int? RecurringTransactionId { get; set; }
-
-        public int? TrackerId { get; set; }
 
         public int PersonId { get; set; }
 
@@ -35,8 +37,7 @@ namespace DashboardWebapp.Models
 
         public virtual Person Person { get; set; }
 
-        public virtual RecurringTransaction RecurringTransaction { get; set; }
-
-        public virtual Tracker Tracker { get; set; }
+        public IEnumerable<Category> CategoryCollection { get; set; }
     }
 }
+                                        

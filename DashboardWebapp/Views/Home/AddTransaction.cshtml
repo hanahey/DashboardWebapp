@@ -1,6 +1,5 @@
 ﻿@model DashboardWebapp.Models.TransactionViewModel
 
-
 @{
     ViewBag.Title = "AddTransaction";
 }
@@ -30,8 +29,16 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
             <div class="col-md-8">
-                @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control", @Value = "" } })
+                @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control", @Value = "", @min = "0.01" } })
                 @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Company, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Company, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Company, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -48,7 +55,7 @@
             <div class="col-md-8">
                 @Html.RadioButtonFor(m => m.Direction, "In", new { @id = "directionIn" }) In &nbsp;
                 @Html.RadioButtonFor(m => m.Direction, "Out", new { @checked = "checked", @id = "directionOut" }) Out
-                @Html.ValidationMessageFor(model => model.Direction, "", new { @class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Direction, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -81,7 +88,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.TrackerId, htmlAttributes: new { @class = "control-label col-md-4", @style = "text-align:left" })
             <div class="col-md-8">
-                @Html.DropDownListFor(model => model.TrackerId, new SelectList(Model.TrackerCollection, "Id", "Name"), "None", new { @class = "form-control", @id="tracker", @onChange = "enableDisableDirection(this)" })
+                @Html.DropDownListFor(model => model.TrackerId, new SelectList(Model.TrackerCollection, "Id", "Name"), "None", new { @class = "form-control", @id = "tracker"@*, @onChange = "enableDisableDirection(this)"*@ })
                 @Html.ValidationMessageFor(model => model.TrackerId, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -101,7 +108,7 @@
         var startDateDiv = document.getElementById('startDateDiv');
         var dateDiv = document.getElementById('dateDiv');
         var selectedDate = document.getElementById('selectedDate');
-        var startDate = document.getElementById('startDate');        
+        var startDate = document.getElementById('startDate');
 
         if (periodId > 0) {
             endDateDiv.style.display = 'block';
@@ -115,22 +122,30 @@
             dateDiv.style.display = 'block';
         }
     }
-    function enableDisableDirection(e) {
-        var tracker = document.getElementById('tracker');
-        var directionOut = document.getElementById('directionOut');
-        var directionIn = document.getElementById('directionIn');
-        var trackerId = $(e).find('option:selected').val();
-        if (trackerId > 0) {
-            directionOut.checked = "true";
-            directionOut.disabled = "disabled";
-            directionIn.disabled = "disabled";
-        }
-        else
-        {
-            directionOut.removeAttribute("disabled");
-            directionIn.removeAttribute("disabled");
-        }
-    }
+    //function enableDisableDirection(e) {
+    //    var tracker = document.getElementById('tracker');
+    //    var directionOut = document.getElementById('directionOut');
+    //    var directionIn = document.getElementById('directionIn');
+    //    var trackerId = $(e).find('option:selected').val();
+    //    if (trackerId > 0) {
+    //        directionOut.checked = "true";
+    //        directionOut.disabled = "disabled";
+    //        directionIn.disabled = "disabled";
+    //    }
+    //    else
+    //    {
+    //        directionOut.removeAttribute("disabled");
+    //        directionIn.removeAttribute("disabled");
+    //    }
+    //}
+</script>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")"
+        type="text/javascript">
+</script>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")"
+        type="text/javascript">
 </script>
 
 @section Scripts {

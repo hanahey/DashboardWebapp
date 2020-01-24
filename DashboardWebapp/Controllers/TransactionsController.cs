@@ -13,16 +13,24 @@ namespace DashboardWebapp.Controllers
     public class TransactionsController : Controller
     {
         DashboardContext db = new DashboardContext();
+        static int currentPersonId;
+
         // GET: Transactions
         public ActionResult Index()
         {
-            var transactions = from t in db.Transactions orderby t.Date descending 
+        //get logged in user
+        string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
+            GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
+        currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
+        var transactions = from t in db.Transactions where t.PersonId == currentPersonId
+                               orderby t.Date descending
                                select new TransactionViewModel
                                {
                                    Id = t.Id,
                                    Name = t.Name,
                                    Date = t.Date,
                                    Amount = t.Amount,
+                                   Company = t.Company,
                                    Category = t.Category,
                                    Tracker = t.Tracker,
                                    RecurringTransaction = t.RecurringTransaction,
@@ -60,11 +68,6 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult AddTransaction(TransactionViewModel model)
         {
-            //get logged in user
-            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
-                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
-            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
-
             Period selectedPeriod = null; //set selected period to null to avoid null reference error when checking period id
             if (model.PeriodId > 0)
             {
@@ -85,6 +88,7 @@ namespace DashboardWebapp.Controllers
                         Name = model.Name,
                         Amount = model.Amount,
                         Date = model.Date,
+                        Company = model.Company,
                         CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,
@@ -107,6 +111,7 @@ namespace DashboardWebapp.Controllers
                         Name = model.Name,
                         Amount = model.Amount,
                         Date = (DateTime)model.StartDate,
+                        Company = model.Company,
                         CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,
@@ -149,6 +154,7 @@ namespace DashboardWebapp.Controllers
                                                     Name = t.Name,
                                                     Date = t.Date,
                                                     Amount = t.Amount,
+                                                    Company = t.Company,
                                                     CategoryId = t.CategoryId,
                                                     PeriodId = t.RecurringTransaction.PeriodId,
                                                     StartDate = t.RecurringTransaction.StartDate,
@@ -250,11 +256,11 @@ namespace DashboardWebapp.Controllers
                 }
             }
 
-            if (model.Direction == "Out") 
+            if (model.Direction == "Out") //append negative symbol to Amount if money is going out
                 model.Amount = -(model.Amount);
-            transaction.Name = model.Name;
-            transaction.Amount = model.Amount; 
-            
+                transaction.Name = model.Name;
+            transaction.Amount = model.Amount;
+            transaction.Company = model.Company;
             transaction.TrackerId = model.TrackerId;
             transaction.CategoryId = model.CategoryId;
 

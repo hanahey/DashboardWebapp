@@ -15,8 +15,7 @@ namespace DashboardWebapp.Models
             Trackers = new HashSet<Tracker>();
             Transactions = new HashSet<Transaction>();
         }
-
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        
         public int Id { get; set; }
 
         [Required]

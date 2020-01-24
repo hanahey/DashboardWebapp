@@ -1,0 +1,25 @@
+﻿@model DashboardWebapp.Models.Item
+
+@{
+    ViewBag.Title = "Delete Item";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+
+        <div class="form-group" style="text-align:center">
+            <p>Are you sure you want to delete <b> @Model.Name </b>? </p>
+        </div>
+
+        <div class="text-center">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

@@ -20,10 +20,10 @@
                     </span>
                 </div>
                 <div class="table-cell">
-                    EXPENSES
+                    TRACKERS
                     &ensp;
-                    <span style="color:red">
-                        £ @((ViewBag.CashFlowExpenses).ToString("N2"))
+                    <span style="color:green">
+                        £ @((ViewBag.CashFlowTrackers).ToString("N2"))
                     </span>
                 </div>
             </div>
@@ -36,10 +36,10 @@
                     </span>
                 </div>
                 <div class="table-cell">
-                    TRACKERS
+                    EXPENSES
                     &ensp;
-                    <span style="color:darkblue">
-                        £ @((ViewBag.CashFlowTrackers).ToString("N2"))
+                    <span style="color:red">
+                        £ @((ViewBag.CashFlowExpenses).ToString("N2"))
                     </span>
                 </div>
             </div>
@@ -59,6 +59,9 @@
                         </th>
                         <th>
                             @Html.DisplayNameFor(model => model.Amount)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Company)
                         </th>
                         <th>
                             @Html.DisplayNameFor(model => model.Category)
@@ -81,7 +84,6 @@
                         <td style="max-width:150px">
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
-
                         <td style="min-width:55px">
                             @item.Date.ToString().Substring(0, 6)
                             @*@Html.DisplayFor(modelItem => item.Date)*@
@@ -96,7 +98,9 @@
                                 @Html.DisplayFor(modelItem => item.Amount)
                             }
                         </td>
-
+                        <td style="max-width:150px">
+                            @Html.DisplayFor(modelItem => item.Company)
+                        </td>
                         <td style="max-width:160px">
                             @Html.DisplayFor(modelItem => item.Category.Name)
                         </td>
@@ -120,39 +124,6 @@
         </div>
     </div>
 
-<!-- Edit Transaction Modal -->
-<div class="modal fade" id="EditModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#286090; color:white">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" style="text-align:center"><b>Edit Transaction</b></h4>
-            </div>
-            <div class="modal-body" id="EditPreview">
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Transaction Modal -->
-<div class="modal fade" id="DeleteModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#286090; color:white">
-                @*3 Sep: the exact shade of blue to match btn-primary*@
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" style="text-align:center"><b>Delete Transaction</b></h4>
-            </div>
-            <div class="modal-body" id="DeletePreview">
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Add Transaction Modal -->
 <div class="modal fade" id="AddTransModal" role="dialog">
     <div class="modal-dialog">
@@ -175,7 +146,6 @@
 
 
 <script type="text/javascript">
-   
     function OpenAddTransModal() {
         $.ajax({
             type: "Get",

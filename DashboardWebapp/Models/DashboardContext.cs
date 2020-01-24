@@ -48,5 +48,7 @@ namespace DashboardWebapp.Models
                 .WithRequired(e => e.Person)
                 .WillCascadeOnDelete(false);
         }
+
+        public System.Data.Entity.DbSet<DashboardWebapp.Models.Item> Items { get; set; }
     }
 }

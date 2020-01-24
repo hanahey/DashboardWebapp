@@ -13,8 +13,13 @@ namespace DashboardWebapp.Controllers
     public class HomeController : Controller
     {
         DashboardContext db = new DashboardContext();
+        static int currentPersonId;
+
         public ActionResult Index()
         {
+            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
+            GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
+            currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
             return View();
         }
 
@@ -23,6 +28,7 @@ namespace DashboardWebapp.Controllers
         {
             var thisMonth = DateTime.Now.Month;
             var transactions = from t in db.Transactions where t.Date.Month == thisMonth
+                               && t.PersonId == currentPersonId
                                orderby t.Date descending
                                select new TransactionViewModel
                                {
@@ -30,12 +36,12 @@ namespace DashboardWebapp.Controllers
                                    Name = t.Name,
                                    Date = t.Date,
                                    Amount = t.Amount,
+                                   Company = t.Company,
                                    Category = t.Category,
                                    Tracker = t.Tracker,
                                };
             //value for 'IN'
             var cashFlowIn = from t in transactions where t.Amount > 0 select t;
-            //ViewBag.CashFlowIn = (from t in transactions where t.Amount > 0 select t.Amount).Sum();
             ViewBag.CashFlowIn = 0;
             double cashFlowInTotal=0;
 
@@ -64,11 +70,11 @@ namespace DashboardWebapp.Controllers
             ViewBag.CashFlowOut = cashFlowOutTotal;
 
             //value for trackers
-            var cashFlowTrackers = from t in transactions where t.Amount < 0 && t.Tracker != null select t;
+            var cashFlowTrackers = from t in transactions where t.Tracker != null select t;
             double cashFlowTrackersTotal = 0;
             foreach (TransactionViewModel t in cashFlowTrackers)
             {
-                double thisTrackerAmount = -t.Amount;
+                double thisTrackerAmount = t.Amount;
                 cashFlowTrackersTotal += thisTrackerAmount;
             }
             ViewBag.CashFlowTrackers = cashFlowTrackersTotal;
@@ -114,18 +120,13 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult AddTransaction(TransactionViewModel model)
         {
-            //get logged in user
-            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
-                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
-            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
-
             Period selectedPeriod = null; //set selected period to null to avoid null reference error when checking period id
             if (model.PeriodId > 0)
             {
                 selectedPeriod = (from p in db.Periods where p.Id == model.PeriodId select p).First();
             }
 
-            if (model.Direction == "Out") //append negative symbol to Amount if money is going out
+            if (model.Direction == "Out") 
             {
                 model.Amount = -model.Amount;
             }
@@ -139,6 +140,7 @@ namespace DashboardWebapp.Controllers
                         Name = model.Name,
                         Amount = model.Amount,
                         Date = model.Date,
+                        Company = model.Company,
                         CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,
@@ -161,6 +163,7 @@ namespace DashboardWebapp.Controllers
                         Name = model.Name,
                         Amount = model.Amount,
                         Date = (DateTime)model.StartDate,
+                        Company = model.Company,
                         CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,
@@ -197,7 +200,7 @@ namespace DashboardWebapp.Controllers
         {
             //currently show only ongoing trackers     
             var ongoingTrackers = (from t in db.Trackers
-                                  where t.EndDate == null || t.EndDate >= DateTime.Now
+                                  where (t.EndDate == null || t.EndDate >= DateTime.Now) && t.PersonId == currentPersonId
                                   select new TrackerViewModel
                                   {
                                       Id = t.Id,
@@ -249,11 +252,6 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult OneTimePayment(int id, TransactionViewModel transaction)
         {
-            //get logged in user
-            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
-                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
-            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
-
             if (ModelState.IsValid)
             {
                 var newOneTimePayment = new Transaction
@@ -290,11 +288,6 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult AddRecurringPayment(int id, TransactionViewModel model)
         {
-            //get logged in user
-            string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
-                GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
-            int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
-
             if (ModelState.IsValid)
             {
                 var recurringTransaction = new RecurringTransaction
@@ -370,6 +363,7 @@ namespace DashboardWebapp.Controllers
         [HttpPost]
         public ActionResult AddTracker(Tracker model)
         {
+            //get logged in user
             string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
                 GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
             int currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
