@@ -8,7 +8,7 @@
         <div class="form-group" style="text-align:center">
             <p>
                 Are you sure you want to stop <b>@ViewBag.TrackerName</b>'s recurring payment of
-                <b>£@(-Model.Transactions.Last().Amount)</b>?
+                <b>£@Model.Transactions.Last().Amount.ToString("N2")</b>?
             </p>
         </div>
 

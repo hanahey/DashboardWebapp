@@ -18,7 +18,7 @@ namespace DashboardWebapp.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
-        DashboardContext db = new DashboardContext();
+        DataContext db = new DataContext();
 
         public AccountController()
         {

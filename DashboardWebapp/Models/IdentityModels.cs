@@ -14,11 +14,13 @@ namespace DashboardWebapp.Models
         {
             Transactions = new HashSet<Transaction>();
             Trackers = new HashSet<Tracker>();
+            Tags = new HashSet<Tag>();
         }
 
         public virtual ICollection<Tracker> Trackers { get; set; }
 
         public virtual ICollection<Transaction> Transactions { get; set; }
+        public virtual ICollection<Tag> Tags { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -32,7 +34,7 @@ namespace DashboardWebapp.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DashboardContext", throwIfV1Schema: false)
+            : base("DataContext", throwIfV1Schema: false)
         {
         }
 

@@ -26,17 +26,18 @@ namespace DashboardWebapp.Models
 
         public string Company { get; set; }
 
-        [Display(Name = "Category")]
-        public int? CategoryId { get; set; }
+        [Display(Name = "Tags")]
+        public IEnumerable<Tag> TagCollection { get; set; }
 
-        public IEnumerable<Category> CategoryCollection { get; set; }
+        [Display(Name = "Tags")]
+        public ICollection<Tag> Tags { get; set; }
 
-        [Display(Name = "Category")]
-        public virtual Category Category { get; set; }
+        [Display(Name = "Tags")]
+        public IEnumerable<int> TagIds { get; set; }
 
         [Display(Name = "In/Out")]
         public string Direction { get; set; }
-        
+
         [Display(Name = "Frequency")]
         public int? PeriodId { get; set; }
 
@@ -44,7 +45,6 @@ namespace DashboardWebapp.Models
 
         [Display(Name = "Period")]
         public virtual Period Period { get; set; }
-      
 
         [Display(Name = "Tracker")]
         public int? TrackerId { get; set; }

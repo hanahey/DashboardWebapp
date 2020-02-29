@@ -12,7 +12,7 @@ namespace DashboardWebapp.Controllers
     [Authorize]
     public class TrackersController : Controller
     {
-        DashboardContext db = new DashboardContext();
+        DataContext db = new DataContext();
         static int currentPersonId;
 
         public ActionResult Index()
@@ -23,22 +23,62 @@ namespace DashboardWebapp.Controllers
             currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
 
             var trackers = from t in db.Trackers
-                           where t.PersonId == currentPersonId select t;
+                           where t.PersonId == currentPersonId
+                           select new TrackerViewModel
+                           {
+                               Id = t.Id,
+                               Name = t.Name,
+                               GoalAmount = t.GoalAmount,
+                               StartDate = t.StartDate,
+                               GoalDate = t.GoalDate,
+                               EndDate = t.EndDate,
+                               Transactions = t.Transactions
+                           };
             return View(trackers);
         }
 
-         // GET: Trackers/Details/5
+        // GET: Trackers/Transactions/5
         public ActionResult TrackerTransactions(int id)
         {
-            var transactions = from trans in db.Transactions where trans.TrackerId == id select trans;
+            var transactions = (from trans in db.Transactions
+                                where trans.TrackerId == id
+                                select new TransactionViewModel
+                                {
+                                    Id = trans.Id,
+                                    Name = trans.Name,
+                                    Date = trans.Date,
+                                    Amount = trans.Amount,
+                                    Company = trans.Company,
+                                    Tracker = trans.Tracker,
+                                    RecurringTransaction = trans.RecurringTransaction,
+                                }).ToList();
+
             foreach (var transaction in transactions)
             {
                 if (transaction.Amount < 0)
                     transaction.Amount = -transaction.Amount;
+
+                var thisTransTags = (from t in db.Transactions
+                                     join transTag in db.TransactionTags on t.Id equals transTag.TransactionId
+                                     join tag in db.Tags on transTag.TagId equals tag.Id
+                                     where t.Id == transaction.Id
+                                     select new
+                                     {
+                                         Id = tag.Id,
+                                         Name = tag.Name,
+                                         PersonId = tag.PersonId,
+                                     }).ToList();
+
+                transaction.Tags = thisTransTags.Select(x => new Tag
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PersonId = x.PersonId,
+                }).ToList();
             }
             return PartialView(transactions);
         }
-        
+
 
         // GET: Trackers/Create
         public ActionResult AddTracker()
@@ -95,7 +135,7 @@ namespace DashboardWebapp.Controllers
             thisTracker.StartDate = tracker.StartDate;
             thisTracker.GoalDate = tracker.GoalDate;
             thisTracker.EndDate = tracker.EndDate;
-           
+
             if (ModelState.IsValid)
             {
                 db.SaveChanges();
@@ -109,7 +149,7 @@ namespace DashboardWebapp.Controllers
             }
         }
 
-        // GET: Categories/Delete/5
+        // GET: Trackers/Delete/5
         public ActionResult DeleteTracker(int id)
         {
             var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();

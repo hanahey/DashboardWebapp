@@ -1,7 +1,5 @@
 ﻿@model IEnumerable<DashboardWebapp.Models.TransactionViewModel>
-
 @{int count = 0;}
-
 <div style="overflow-y:scroll;max-height:80vh">
     <div style="border:solid;">
         <h2 style="text-align:center">
@@ -44,90 +42,92 @@
                 </div>
             </div>
         </div>
-
-            <table class="table table-striped" style="font-size:11px">
-                <thead>
-                    <tr>
-                        <th>
-                            No.
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Name)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Date)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Amount)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Company)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Category)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Direction)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody style="font-weight:normal">
-                    @if (Model != null)
+        <table class="table table-striped" style="font-size:11px">
+            <thead>
+                <tr>
+                    <th>
+                        No.
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Date)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Amount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Company)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Tags)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Direction)
+                    </th>
+                </tr>
+            </thead>
+            <tbody style="font-weight:normal">
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
                     {
-                        foreach (var item in Model)
-                        {
-                    <tr>
-                        <td>
-                            @{ count = count + 1;}
-                            @count
-                        </td>
-                        <td style="max-width:150px">
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td style="min-width:55px">
-                            @item.Date.ToString().Substring(0, 6)
-                            @*@Html.DisplayFor(modelItem => item.Date)*@
-                        </td>
-                        <td style="min-width:75px">
-                            @if (item.Amount < 0)
-                            {
-                                @((-item.Amount).ToString("N2"))
-                            }
-                            else
-                            {
-                                @Html.DisplayFor(modelItem => item.Amount)
-                            }
-                        </td>
-                        <td style="max-width:150px">
-                            @Html.DisplayFor(modelItem => item.Company)
-                        </td>
-                        <td style="max-width:160px">
-                            @Html.DisplayFor(modelItem => item.Category.Name)
-                        </td>
-
-                        <td>
-                            @if (item.Amount < 0)
-                            {
-                                item.Direction = "Out";
-                            }
-                            else
-                            {
-                                item.Direction = "In";
-                            }
-                            @Html.DisplayFor(modelItem => item.Direction)
-                        </td>
-                    </tr>
-                        }
+                        <tr>
+                            <td>
+                                @{ count = count + 1;}
+                                @count
+                            </td>
+                            <td style="max-width:150px">
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td style="min-width:55px">
+                                @item.Date.ToString().Substring(0, 6)
+                            </td>
+                            <td style="min-width:75px">
+                                @if (item.Amount < 0)
+                                {
+                                    @((-item.Amount).ToString("N2"))
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(modelItem => item.Amount)
+                                }
+                            </td>
+                            <td style="max-width:150px">
+                                @Html.DisplayFor(modelItem => item.Company)
+                            </td>
+                            <td style="max-width:160px">
+                                @if (item.Tags != null)
+                                {
+                                    foreach (var tag in item.Tags)
+                                    {
+                                        @tag.Name
+                                        <br />
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if (item.Amount < 0)
+                                {
+                                    item.Direction = "Out";
+                                }
+                                else
+                                {
+                                    item.Direction = "In";
+                                }
+                                @Html.DisplayFor(modelItem => item.Direction)
+                            </td>
+                        </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
-
+</div>
 <!-- Add Transaction Modal -->
 <div class="modal fade" id="AddTransModal" role="dialog">
     <div class="modal-dialog">
-
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
@@ -139,11 +139,9 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
-
 
 <script type="text/javascript">
     function OpenAddTransModal() {

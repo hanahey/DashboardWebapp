@@ -12,10 +12,12 @@ namespace DashboardWebapp.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Person()
         {
+            Items = new HashSet<Item>();
+            Tags = new HashSet<Tag>();
             Trackers = new HashSet<Tracker>();
             Transactions = new HashSet<Transaction>();
         }
-        
+
         public int Id { get; set; }
 
         [Required]
@@ -38,6 +40,12 @@ namespace DashboardWebapp.Models
         [Required]
         [StringLength(128)]
         public string UserId { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Item> Items { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Tag> Tags { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Tracker> Trackers { get; set; }

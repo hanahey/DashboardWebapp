@@ -1,20 +1,15 @@
-﻿@model IEnumerable<DashboardWebapp.Models.Item>
-
+﻿@model IEnumerable<DashboardWebapp.Models.ItemViewModel>
 @{
     ViewBag.Title = "Price List";
 }
-
 @{int count = 0;}
-
 <br />
-
 <h4>
     <a onclick="OpenAddModal()" style="cursor:pointer">
         <img src="@Url.Content("~/Images/add-button.png")" style="width:40px;height:40px;" />
         Add Item
     </a>
 </h4>
-
 <table class="table table-striped">
     <thead>
         <tr>
@@ -37,13 +32,13 @@
                 @Html.DisplayNameFor(model => model.Store)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
+                @Html.DisplayNameFor(model => model.Tags)
             </th>
             <th>
                 Actions
             </th>
         </tr>
-        </thead>
+    </thead>
     <tbody>
         @if (Model != null)
         {
@@ -70,7 +65,11 @@
                         @Html.DisplayFor(modelItem => item.Store)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Category.Name)
+                        @foreach (var tag in item.Tags)
+                        {
+                            @tag.Name
+                            <br />
+                        }
                     </td>
                     <td>
                         <a onclick="OpenEditModal(@item.Id)" style="cursor:pointer">Edit</a> &nbsp;
@@ -81,11 +80,9 @@
         }
     </tbody>
 </table>
-
 <!-- Edit Item Modal -->
 <div class="modal fade" id="EditModal" role="dialog">
     <div class="modal-dialog">
-
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
@@ -97,11 +94,9 @@
         </div>
     </div>
 </div>
-
 <!-- Delete Item Modal -->
 <div class="modal fade" id="DeleteModal" role="dialog">
     <div class="modal-dialog">
-
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
@@ -113,11 +108,9 @@
         </div>
     </div>
 </div>
-
 <!-- Add Item Modal -->
 <div class="modal fade" id="AddModal" role="dialog">
     <div class="modal-dialog">
-
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="background-color:#286090; color:white">
@@ -129,11 +122,9 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
-
 
 <script type="text/javascript">
     function OpenEditModal(currentId) {

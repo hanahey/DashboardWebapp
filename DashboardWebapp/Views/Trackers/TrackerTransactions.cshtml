@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DashboardWebapp.Models.Transaction>
+﻿@model IEnumerable<DashboardWebapp.Models.TransactionViewModel>
 
 @{
     ViewBag.Title = "TrackerTransactions";
@@ -28,7 +28,7 @@
                 @Html.DisplayNameFor(model => model.Date)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.Tags)
             </th>
         </tr>
     </thead>
@@ -50,7 +50,14 @@
                 @Html.DisplayFor(modelItem => item.Date)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
+                @if (item.Tags != null)
+                {
+                    foreach (var tag in item.Tags)
+                    {
+                        @tag.Name
+                        <br />
+                    }
+                }
             </td>
         </tr>
         }

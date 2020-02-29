@@ -12,7 +12,7 @@ namespace DashboardWebapp.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        DashboardContext db = new DashboardContext();
+        DataContext db = new DataContext();
         static int currentPersonId;
 
         public ActionResult Index()
@@ -27,7 +27,8 @@ namespace DashboardWebapp.Controllers
         public ActionResult CashFlow()
         {
             var thisMonth = DateTime.Now.Month;
-            var transactions = from t in db.Transactions where t.Date.Month == thisMonth
+            var transactions = (from t in db.Transactions
+                               where t.Date.Month == thisMonth
                                && t.PersonId == currentPersonId
                                orderby t.Date descending
                                select new TransactionViewModel
@@ -37,22 +38,23 @@ namespace DashboardWebapp.Controllers
                                    Date = t.Date,
                                    Amount = t.Amount,
                                    Company = t.Company,
-                                   Category = t.Category,
                                    Tracker = t.Tracker,
-                               };
+                                   RecurringTransaction = t.RecurringTransaction,
+                               }).ToList();
+        
             //value for 'IN'
             var cashFlowIn = from t in transactions where t.Amount > 0 select t;
             ViewBag.CashFlowIn = 0;
-            double cashFlowInTotal=0;
+            double cashFlowInTotal = 0;
 
             foreach (TransactionViewModel t in cashFlowIn)
             {
                 double thisinAmount = 0;
-                if (t !=null)
+                if (t != null)
                 {
                     thisinAmount = t.Amount;
                 }
-                
+
                 cashFlowInTotal += thisinAmount;
             }
 
@@ -89,22 +91,45 @@ namespace DashboardWebapp.Controllers
             }
             ViewBag.CashFlowExpenses = cashFlowExpensesTotal;
 
-            return PartialView(transactions); 
+            //get all tags mapped to all of this user's transactions
+            foreach (TransactionViewModel transaction in transactions)
+            {
+                var thisTransTags = (from t in db.Transactions
+                                     join transTag in db.TransactionTags on t.Id equals transTag.TransactionId
+                                     join tag in db.Tags on transTag.TagId equals tag.Id
+                                     where t.Id == transaction.Id
+                                     select new
+                                     {
+                                         Id = tag.Id,
+                                         Name = tag.Name,
+                                         PersonId = tag.PersonId,
+                                     }).ToList();
+
+                transaction.Tags = thisTransTags.Select(x => new Tag
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PersonId = x.PersonId,
+                }).ToList();
+            }
+
+            return PartialView(transactions);
         }
 
         public ActionResult AddTransaction()
         {
             TransactionViewModel transaction = new TransactionViewModel();
-            transaction.CategoryCollection = db.Categories.ToList<Category>();
-            transaction.PeriodCollection = db.Periods.ToList<Period>();
+            transaction.TagCollection = from t in db.Tags where t.PersonId == currentPersonId select t;
+            transaction.PeriodCollection = db.Periods.ToList();
 
-            //get TrackerCollection WITHOUT Trackers with a current RecurringTransaction:            
-            List<Tracker>TrackerCollectionList = db.Trackers.ToList<Tracker>();
+            //get TrackerCollection WITHOUT Trackers with a current RecurringTransaction:
+            List<Tracker> TrackerCollectionList = (from t in db.Trackers where t.PersonId == currentPersonId select t).ToList();
             //NOTE: take from TRANSACTION db because that is the table linked to the Tracker table
             var recurringTransactionwithTracker = (from t in db.Transactions
-                                                  where t.RecurringTransaction != null
-                                                  && (t.RecurringTransaction.EndDate == null ||
-                                                  t.RecurringTransaction.EndDate > DateTime.Now) select t).ToList();
+                                                   where t.RecurringTransaction != null
+                                                   && (t.RecurringTransaction.EndDate == null ||
+                                                   t.RecurringTransaction.EndDate > DateTime.Now)
+                                                   select t).ToList();
 
             foreach (var t in recurringTransactionwithTracker)
             {
@@ -126,7 +151,7 @@ namespace DashboardWebapp.Controllers
                 selectedPeriod = (from p in db.Periods where p.Id == model.PeriodId select p).First();
             }
 
-            if (model.Direction == "Out") 
+            if (model.Direction == "Out") //append negative symbol to Amount if money is going out
             {
                 model.Amount = -model.Amount;
             }
@@ -141,11 +166,23 @@ namespace DashboardWebapp.Controllers
                         Amount = model.Amount,
                         Date = model.Date,
                         Company = model.Company,
-                        CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,
                     };
                     db.Transactions.Add(transaction);
+
+                    if (model.TagIds != null)
+                    {
+                        foreach (int t in model.TagIds)
+                        {
+                            var tag = new Transaction_Tag
+                            {
+                                TransactionId = transaction.Id,
+                                TagId = t,
+                            };
+                            db.TransactionTags.Add(tag);
+                        }
+                    }
                 }
                 else //add RecurringTransactionId + RecurringTransaction record if needed
                 {
@@ -164,21 +201,33 @@ namespace DashboardWebapp.Controllers
                         Amount = model.Amount,
                         Date = (DateTime)model.StartDate,
                         Company = model.Company,
-                        CategoryId = model.CategoryId,
                         TrackerId = model.TrackerId,
                         PersonId = currentPersonId,
                         RecurringTransactionId = recurringTransaction.Id
                     };
                     db.Transactions.Add(transaction);
+
+                    if (model.TagIds != null)
+                    {
+                        foreach (int t in model.TagIds)
+                        {
+                            var tag = new Transaction_Tag
+                            {
+                                TransactionId = transaction.Id,
+                                TagId = t,
+                            };
+                            db.TransactionTags.Add(tag);
+                        }
+                    }
                 }
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             else
             {
-                model.CategoryCollection = db.Categories.ToList<Category>();
+                model.TagCollection = from t in db.Tags where t.PersonId == currentPersonId select t;
                 model.PeriodCollection = db.Periods.ToList<Period>();
-                List<Tracker> TrackerCollectionList = db.Trackers.ToList<Tracker>();
+                List<Tracker> TrackerCollectionList = (from t in db.Trackers where t.PersonId == currentPersonId select t).ToList();
                 var recurringTransactionwithTracker = (from t in db.Transactions
                                                        where t.RecurringTransaction != null
                                                        && (t.RecurringTransaction.EndDate == null ||
@@ -200,25 +249,25 @@ namespace DashboardWebapp.Controllers
         {
             //currently show only ongoing trackers     
             var ongoingTrackers = (from t in db.Trackers
-                                  where (t.EndDate == null || t.EndDate >= DateTime.Now) && t.PersonId == currentPersonId
-                                  select new TrackerViewModel
-                                  {
-                                      Id = t.Id,
-                                      Name = t.Name,
-                                      GoalAmount = t.GoalAmount,
-                                      StartDate = t.StartDate,
-                                      GoalDate = t.GoalDate,
-                                      EndDate = t.EndDate,
-                                      PersonId = t.PersonId,
-                                      RecurringTransaction = (from rt in db.RecurringTransactions
-                                                              where rt.Id == ((from trans in db.Transactions
-                                                                               where trans.RecurringTransactionId != null && trans.TrackerId == t.Id
-                                                                               && (trans.RecurringTransaction.EndDate == null ||
-                                                                               trans.RecurringTransaction.EndDate > DateTime.Now)
-                                                                               select trans.RecurringTransactionId).FirstOrDefault())
-                                                              select rt).FirstOrDefault(),
-                                      Transactions = t.Transactions,
-                                  }).ToList();
+                                   where (t.EndDate == null || t.EndDate >= DateTime.Now) && t.PersonId == currentPersonId
+                                   select new TrackerViewModel
+                                   {
+                                       Id = t.Id,
+                                       Name = t.Name,
+                                       GoalAmount = t.GoalAmount,
+                                       StartDate = t.StartDate,
+                                       GoalDate = t.GoalDate,
+                                       EndDate = t.EndDate,
+                                       PersonId = t.PersonId,
+                                       RecurringTransaction = (from rt in db.RecurringTransactions
+                                                               where rt.Id == ((from trans in db.Transactions
+                                                                                where trans.RecurringTransactionId != null && trans.TrackerId == t.Id
+                                                                                && (trans.RecurringTransaction.EndDate == null ||
+                                                                                trans.RecurringTransaction.EndDate > DateTime.Now)
+                                                                                select trans.RecurringTransactionId).FirstOrDefault())
+                                                               select rt).FirstOrDefault(),
+                                       Transactions = t.Transactions,
+                                   }).ToList();
 
             //need to manually change all negative Amount values to positive to calculate amount in tracker so far
             foreach (TrackerViewModel t in ongoingTrackers)
@@ -244,42 +293,55 @@ namespace DashboardWebapp.Controllers
         public ActionResult OneTimePayment(int id)
         {
             TransactionViewModel transaction = new TransactionViewModel();
-            transaction.CategoryCollection = db.Categories.ToList<Category>();
+            transaction.TagCollection = from t in db.Tags where t.PersonId == currentPersonId select t;
             transaction.Tracker = (from t in db.Trackers where t.Id == id select t).First();
             return PartialView(transaction);
         }
 
         [HttpPost]
-        public ActionResult OneTimePayment(int id, TransactionViewModel transaction)
+        public ActionResult OneTimePayment(int id, TransactionViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var newOneTimePayment = new Transaction
+                var transaction = new Transaction
                 {
-                    Name = transaction.Name,
-                    Amount = -(transaction.Amount),
-                    Date = transaction.Date,
+                    Name = model.Name,
+                    Amount = model.Amount,
+                    Date = model.Date,
                     TrackerId = id,
-                    CategoryId = transaction.CategoryId,
                     PersonId = currentPersonId
                 };
-                db.Transactions.Add(newOneTimePayment);
+                db.Transactions.Add(transaction);
+
+                if (model.TagIds != null)
+                {
+                    foreach (int t in model.TagIds)
+                    {
+                        var tag = new Transaction_Tag
+                        {
+                            TransactionId = transaction.Id,
+                            TagId = t,
+                        };
+                        db.TransactionTags.Add(tag);
+                    }
+                }
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
 
             }
             else
             {
-                transaction.CategoryCollection = db.Categories.ToList<Category>();
-                transaction.Tracker = (from t in db.Trackers where t.Id == id select t).First();
-                return PartialView(transaction);
-            }                
+                model.TagCollection = from t in db.Tags where t.PersonId == currentPersonId select t;
+                model.Tracker = (from t in db.Trackers where t.Id == id select t).First();
+                return PartialView(model);
+            }
         }
 
         public ActionResult AddRecurringPayment(int id)
         {
             TransactionViewModel transaction = new TransactionViewModel();
-            transaction.CategoryCollection = db.Categories.ToList<Category>();
+            transaction.TagCollection = from t in db.Tags where t.PersonId == currentPersonId select t;
             transaction.PeriodCollection = db.Periods.ToList<Period>();
             transaction.Tracker = (from t in db.Trackers where t.Id == id select t).First();
             return PartialView(transaction);
@@ -302,37 +364,53 @@ namespace DashboardWebapp.Controllers
                 var transaction = new Transaction
                 {
                     Name = model.Name,
-                    Amount = -(model.Amount),
+                    Amount = model.Amount,
                     Date = (DateTime)model.StartDate,
-                    CategoryId = model.CategoryId,
                     TrackerId = id,
                     PersonId = currentPersonId,
                     RecurringTransactionId = recurringTransaction.Id
                 };
                 db.Transactions.Add(transaction);
+
+                if (model.TagIds != null)
+                {
+                    foreach (int t in model.TagIds)
+                    {
+                        var tag = new Transaction_Tag
+                        {
+                            TransactionId = transaction.Id,
+                            TagId = t,
+                        };
+                        db.TransactionTags.Add(tag);
+                    }
+                }
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             else
             {
-                model.CategoryCollection = db.Categories.ToList<Category>();
+                model.TagCollection = from t in db.Tags where t.PersonId == currentPersonId select t;
                 model.PeriodCollection = db.Periods.ToList<Period>();
                 model.Tracker = (from t in db.Trackers where t.Id == id select t).First();
                 return PartialView(model);
             }
-        }        
+        }
 
         public ActionResult StopRecurringPayment(int id)
         {
             var transaction = (from t in db.Transactions
-                               where t.TrackerId == id && t.RecurringTransaction != null orderby t.Id descending
+                               where t.TrackerId == id && t.RecurringTransaction != null
+                               orderby t.Id descending
                                select t).First();
-            var recurringTransaction = (from rt in db.RecurringTransactions where 
-                                        rt.Id == transaction.RecurringTransactionId select rt).First();
+            var recurringTransaction = (from rt in db.RecurringTransactions
+                                        where
+    rt.Id == transaction.RecurringTransactionId
+                                        select rt).First();
             ViewBag.TrackerName = (from t in db.Trackers where t.Id == id select t.Name).First(); //get tracker
             return PartialView(recurringTransaction);
         }
-        
+
         [HttpPost]
         public ActionResult StopRecurringPayment(int id, RecurringTransaction model)
         {
@@ -359,7 +437,7 @@ namespace DashboardWebapp.Controllers
         {
             return PartialView();
         }
-        
+
         [HttpPost]
         public ActionResult AddTracker(Tracker model)
         {
@@ -387,7 +465,7 @@ namespace DashboardWebapp.Controllers
             {
                 return PartialView();
             }
-        }        
+        }
         public ActionResult EditTracker(int id)
         {
             var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
@@ -400,7 +478,7 @@ namespace DashboardWebapp.Controllers
             }
             return PartialView(tracker);
         }
-        
+
         [HttpPost]
         public ActionResult EditTracker(int id, Tracker tracker)
         {
@@ -422,13 +500,13 @@ namespace DashboardWebapp.Controllers
                 return PartialView(tracker);
             }
         }
-        
+
         public ActionResult DeleteTracker(int id)
         {
             var tracker = db.Trackers.Where(t => t.Id == id).FirstOrDefault();
             return PartialView(tracker);
         }
-        
+
         [HttpPost]
         public ActionResult DeleteTracker(int id, Tracker model)
         {
@@ -444,7 +522,7 @@ namespace DashboardWebapp.Controllers
                 return PartialView();
             }
         }
-        
+
 
         //public ActionResult About()
         //{

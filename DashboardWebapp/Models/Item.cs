@@ -9,14 +9,18 @@ namespace DashboardWebapp.Models
     [Table("Item")]
     public partial class Item
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Item()
+        {
+            ItemTags = new HashSet<Item_Tag>();
+        }
+
         public int Id { get; set; }
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "Details")]
         public string Name { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:N2}")]
         public double Price { get; set; }
 
         [Required]
@@ -28,16 +32,11 @@ namespace DashboardWebapp.Models
         [StringLength(50)]
         public string Measurement { get; set; }
 
-        [Display(Name = "Category")]
-        public int? CategoryId { get; set; }
-
         public int PersonId { get; set; }
-
-        public virtual Category Category { get; set; }
 
         public virtual Person Person { get; set; }
 
-        public IEnumerable<Category> CategoryCollection { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Item_Tag> ItemTags { get; set; }
     }
 }
-                                        

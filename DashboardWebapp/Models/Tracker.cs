@@ -19,26 +19,14 @@ namespace DashboardWebapp.Models
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "Goal Name")]
         public string Name { get; set; }
 
-        [Required]
-        [Display(Name = "Goal Amount (£)")]
-        [DisplayFormat(DataFormatString = "{0:N2}")]
         public double GoalAmount { get; set; }
 
-        [Required]
-        [Display(Name = "Start Date")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime StartDate { get; set; }
 
-        [Required]
-        [Display(Name = "Goal Date")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime GoalDate { get; set; }
 
-        [Display(Name = "End Date")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime? EndDate { get; set; }
 
         public int PersonId { get; set; }

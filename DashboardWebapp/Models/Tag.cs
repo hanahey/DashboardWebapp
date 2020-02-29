@@ -6,27 +6,30 @@ namespace DashboardWebapp.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Category")]
-    public partial class Category
+    [Table("Tag")]
+    public partial class Tag
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Category()
+        public Tag()
         {
-            Transactions = new HashSet<Transaction>();
+            Item_Tag = new HashSet<Item_Tag>();
+            Transaction_Tag = new HashSet<Transaction_Tag>();
         }
 
         public int Id { get; set; }
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "Category")]
         public string Name { get; set; }
 
         public int PersonId { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Item_Tag> Item_Tag { get; set; }
+
         public virtual Person Person { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Transaction> Transactions { get; set; }
+        public virtual ICollection<Transaction_Tag> Transaction_Tag { get; set; }
     }
 }

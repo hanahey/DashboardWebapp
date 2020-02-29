@@ -10,36 +10,36 @@ using System.Web.Mvc;
 namespace DashboardWebapp.Controllers
 {
     [Authorize]
-    public class CategoriesController : Controller
+    public class TagsController : Controller
     {
-        DashboardContext db = new DashboardContext();
+        DataContext db = new DataContext();
         static int currentPersonId;
 
-        // GET: Categories
+        // GET: Tags
         public ActionResult Index()
         {
             //get logged in user
             string currentUserId = System.Web.HttpContext.Current.GetOwinContext().
                 GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
             currentPersonId = (from c in db.People where c.UserId == currentUserId select c).FirstOrDefault().Id;
-            var categories = from c in db.Categories where c.PersonId == currentPersonId select c;
-            return View(categories);
+            var tags = from t in db.Tags where t.PersonId == currentPersonId select t;
+            return View(tags);
         }
 
-        // GET: Categories/AddCategory
-        public ActionResult AddCategory()
+        // GET: Tags/AddTag
+        public ActionResult AddTag()
         {
             return PartialView();
         }
 
-        // POST: Categories/AddCategory
+        // POST: Tags/AddTag
         [HttpPost]
-        public ActionResult AddCategory(Category model)
+        public ActionResult AddTag(Tag model)
         {
             if (ModelState.IsValid)
             {
-                var category = new Category { Name = model.Name, PersonId = currentPersonId };
-                db.Categories.Add(category);
+                var tag = new Tag {Name = model.Name, PersonId = currentPersonId };
+                db.Tags.Add(tag);
                 db.SaveChanges();
 
                 return RedirectToAction("Index");
@@ -50,19 +50,19 @@ namespace DashboardWebapp.Controllers
             }
         }
 
-        // GET: Categories/Edit/5
-        public ActionResult EditCategory(int id)
+        // GET: Tags/EditTag/5
+        public ActionResult EditTag(int id)
         {
-            var category = db.Categories.Where(t => t.Id == id).FirstOrDefault();
-            return PartialView(category);
+            var tag = db.Tags.Where(t => t.Id == id).FirstOrDefault();
+            return PartialView(tag);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Tags/EditTag/5
         [HttpPost]
-        public ActionResult EditCategory(int id, Category category)
+        public ActionResult EditTag(int id, Tag tag)
         {
-            var thisCategory = db.Categories.Where(t => t.Id == id).FirstOrDefault();
-            thisCategory.Name = category.Name;
+            var thisTag = db.Tags.Where(t => t.Id == id).FirstOrDefault();
+            thisTag.Name = tag.Name;
 
             if (ModelState.IsValid)
             {
@@ -72,31 +72,31 @@ namespace DashboardWebapp.Controllers
             }
             else
             {
-                return PartialView(category);
+                return PartialView(tag);
             }
         }
 
-        // GET: Categories/Delete/5
-        public ActionResult DeleteCategory(int id)
+        // GET: Tags/DeleteTag/5
+        public ActionResult DeleteTag(int id)
         {
-            var category = db.Categories.Where(t => t.Id == id).FirstOrDefault();
-            return PartialView(category);
+            var tag = db.Tags.Where(t => t.Id == id).FirstOrDefault();
+            return PartialView(tag);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Tags/Delete/5
         [HttpPost]
-        public ActionResult DeleteCategory(int id, Category category)
+        public ActionResult DeleteTag(int id, Tag tag)
         {
             try
             {
-                var thisCategory = (from c in db.Categories where c.Id == id select c).First();
-                db.Categories.Remove(thisCategory);
+                var thisTag = (from t in db.Tags where t.Id == id select t).First();
+                db.Tags.Remove(thisTag);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             catch
             {
-                return PartialView(category);
+                return PartialView(tag);
             }
         }
     }
